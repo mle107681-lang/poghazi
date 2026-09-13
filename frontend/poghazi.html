@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>POGHAZI - Shop Dịch Vụ Game & Social Media</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        dark: '#0F1115',
+                        darker: '#090B0E',
+                        gray: '#1E2128',
+                        'gray-light': '#2A2D37',
+                        accent: '#8B5CF6',
+                        'accent-light': '#A78BFA',
+                        success: '#34D399',
+                        warning: '#FBBF24',
+                        danger: '#F87171',
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', 'sans-serif'],
+                    },
+                },
+            },
+            darkMode: 'class'
+        }
+    </script>
+    <style type="text/tailwindcss">
+        @layer utilities {
+            .content-auto {
+                content-visibility: auto;
+            }
+            .scrollbar-hide {
+                -ms-overflow-style: none;
+                scrollbar-width: none;
+            }
+            .scrollbar-hide::-webkit-scrollbar {
+                display: none;
+            }
+            .text-shadow {
+                text-shadow: 0 0 8px rgba(139, 92, 246, 0.4);
+            }
+            .glow {
+                box-shadow: 0 0 15px rgba(139, 92, 246, 0.3);
+            }
+        }
+    </style>
+    <style>
+        body {
+            background-color: #0F1115;
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            color: #FFFFFF;
+        }
+        .nav-item:hover {
+            transform: translateX(5px);
+        }
+        .card:hover {
+            transform: translateY(-5px);
+        }
+        .gradient-text {
+            background: linear-gradient(90deg, #A78BFA, #D8B4FE);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-weight: 800;
+        }
+        p, span, li, a {
+            color: #F3F4F6 !important;
+        }
+        .text-gray-300, .text-gray-400 {
+            color: #D1D5DB !important;
+        }
+        .text-gray-400.text-sm {
+            color: #E5E7EB !important;
+        }
+        h1, h2, h3, h4, h5, h6 {
+            color: #FFFFFF !important;
+            font-weight: 700;
+        }
+    </style>
+</head>
+<body class="bg-dark text-white min-h-screen">
+    <div class="flex flex-col md:flex-row min-h-screen">
+        <!-- SIDEBAR -->
+        <aside class="bg-darker w-full md:w-64 shrink-0 transition-all duration-300" id="sidebar">
+            <div class="p-4 border-b border-gray-light/50">
+                <h1 class="text-[clamp(1.5rem,3vw,2rem)] font-bold gradient-text text-center py-2">POGHAZI</h1>
+                <p class="text-gray-300 text-center font-medium">Shop Dịch Vụ Game & MXH</p>
+            </div>
+
+            <nav class="p-3 overflow-y-auto max-h-[calc(100vh-80px)] scrollbar-hide">
+                <div class="mb-6">
+                    <h2 class="text-gray-200 text-sm uppercase font-bold px-3 py-2">Danh mục chính</h2>
+                    <ul class="space-y-1 mt-1">
+                        <li>
+                            <a href="#tiktok" class="nav-item flex items-center px-3 py-2.5 rounded-lg hover:bg-gray-light/50 transition-all duration-200">
+                                <i class="fa fa-music mr-3 text-pink-400 text-lg"></i>
+                                <span class="font-medium">TikTok</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#youtube" class="nav-item flex items-center px-3 py-2.5 rounded-lg hover:bg-gray-light/50 transition-all duration-200">
+                                <i class="fa fa-youtube-play mr-3 text-red-400 text-lg"></i>
+                                <span class="font-medium">YouTube</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#facebook" class="nav-item flex items-center px-3 py-2.5 rounded-lg hover:bg-gray-light/50 transition-all duration-200">
+                                <i class="fa fa-facebook-square mr-3 text-blue-400 text-lg"></i>
+                                <span class="font-medium">Facebook</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#instagram" class="nav-item flex items-center px-3 py-2.5 rounded-lg hover:bg-gray-light/50 transition-all duration-200">
+                                <i class="fa fa-instagram mr-3 text-pink-400 text-lg"></i>
+                                <span class="font-medium">Instagram</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#game" class="nav-item flex items-center px-3 py-2.5 rounded-lg bg-accent/20 text-accent-light font-bold">
+                                <i class="fa fa-gamepad mr-3 text-lg"></i>
+                                <span>Game</span>
+                                <i class="fa fa-chevron-down ml-auto text-xs"></i>
+                            </a>
+                            <ul class="pl-6 mt-1 space-y-1">
+                                <li>
+                                    <a href="#roblox" class="block px-3 py-2 rounded-lg hover:bg-gray-light/50 font-medium transition-colors">
+                                        Roblox
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="#cay-thue" class="block px-3 py-2 rounded-lg hover:bg-gray-light/50 font-medium transition-colors">
+                                        Cày thuê
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="#game-khac" class="block px-3 py-2 rounded-lg hover:bg-gray-light/50 font-medium transition-colors">
+                                        Dịch vụ khác
+                                    </a>
+                                </li>
+                            </ul>
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="mb-6">
+                    <h2 class="text-gray-200 text-sm uppercase font-bold px-3 py-2">Tài khoản</h2>
+                    <ul class="space-y-1 mt-1">
+                        <li>
+                            <a href="#dang-nhap" class="nav-item flex items-center px-3 py-2.5 rounded-lg hover:bg-gray-light/50 transition-all duration-200">
+                                <i class="fa fa-sign-in mr-3 text-gray-300 text-lg"></i>
+                                <span class="font-medium">Đăng nhập / Đăng ký</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#so-du" class="nav-item flex items-center px-3 py-2.5 rounded-lg hover:bg-gray-light/50 transition-all duration-200">
+                                <i class="fa fa-wallet mr-3 text-green-400 text-lg"></i>
+                                <span class="font-medium">Số dư tài khoản</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#nap-tien" class="nav-item flex items-center px-3 py-2.5 rounded-lg hover:bg-gray-light/50 transition-all duration-200">
+                                <i class="fa fa-credit-card mr-3 text-yellow-400 text-lg"></i>
+                                <span class="font-medium">Nạp tiền</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#lich-su-nap" class="nav-item flex items-center px-3 py-2.5 rounded-lg hover:bg-gray-light/50 transition-all duration-200">
+                                <i class="fa fa-history mr-3 text-blue-400 text-lg"></i>
+                                <span class="font-medium">Lịch sử nạp</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#lich-su-don" class="nav-item flex items-center px-3 py-2.5 rounded-lg hover:bg-gray-light/50 transition-all duration-200">
+                                <i class="fa fa-list-alt mr-3 text-purple-400 text-lg"></i>
+                                <span class="font-medium">Lịch sử đơn hàng</span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+
+                <div>
+                    <h2 class="text-gray-200 text-sm uppercase font-bold px-3 py-2">Quản trị</h2>
+                    <ul class="space-y-1 mt-1">
+                        <li>
+                            <a href="#admin" class="nav-item flex items-center px-3 py-2.5 rounded-lg hover:bg-gray-light/50 transition-all duration-200">
+                                <i class="fa fa-cog mr-3 text-orange-400 text-lg"></i>
+                                <span class="font-medium">Trang quản trị</span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </nav>
+        </aside>
+
+        <!-- MAIN CONTENT -->
+        <main class="flex-1 p-4 md:p-6">
+            <!-- HEADER -->
+            <header class="flex justify-between items-center mb-8">
+                <button class="md:hidden text-2xl text-white" id="menuToggle">
+                    <i class="fa fa-bars"></i>
+                </button>
+                <div>
+                    <h2 class="text-xl md:text-2xl font-bold text-white">Chào mừng đến với POGHAZI</h2>
+                    <p class="text-gray-200 text-sm font-medium">Dịch vụ uy tín • Nhanh chóng • An toàn</p>
+                </div>
+                <div class="flex items-center gap-3">
+                    <div class="bg-gray px-3 py-1.5 rounded-lg flex items-center border border-gray-light/50">
+                        <i class="fa fa-wallet text-green-400 mr-2"></i>
+                        <span class="font-bold text-white">0 ₫</span>
+                    </div>
+                    <a href="#dang-nhap" class="bg-accent hover:bg-accent-light px-4 py-2 rounded-lg transition-colors glow font-bold text-white">
+                        Đăng nhập
+                    </a>
+                </div>
+            </header>
+
+            <!-- HƯỚNG DẪN ĐẶT HÀNG -->
+            <section class="bg-gray rounded-xl p-6 mb-8 border border-gray-light/50">
+                <h3 class="text-xl font-bold mb-4 text-white">🛒 Hướng dẫn đặt dịch vụ</h3>
+                <div class="bg-darker rounded-lg p-4 space-y-3">
+                    <p class="text-lg">1️⃣ Chọn danh mục → Chọn dịch vụ bạn cần</p>
+                    <p class="text-lg">2️⃣ Nhập thông tin yêu cầu (tài khoản, số lượng...)</p>
+                    <p class="text-lg">3️⃣ Thanh toán bằng số dư tài khoản</p>
+                    <p class="text-lg">4️⃣ Hệ thống tự tạo đơn & tiến hành thực hiện</p>
+                    <p class="text-accent-light font-bold mt-3">Ví dụ: Roblox → Cày thuê → Nhập thông tin → Thanh toán → Tạo đơn ✅</p>
+                </div>
+            </section>
+
+            <!-- NẠP TIỀN - ĐÃ CẬP NHẬT QR CỦA BẠN -->
+            <section class="bg-gray rounded-xl p-6 mb-8 border border-gray-light/50" id="nap-tien">
+                <h3 class="text-xl font-bold mb-4 text-white">💳 Nạp tiền vào tài khoản</h3>
+                <div class="grid md:grid-cols-2 gap-6">
+                    <div>
+                        <h4 class="font-bold mb-3 text-white">Chọn số tiền nạp</h4>
+                        <div class="grid grid-cols-2 gap-3 mb-4">
+                            <button class="bg-darker hover:bg-accent/30 border border-gray-light rounded-lg p-3 font-bold transition-colors">
+                                50.000 ₫
+                            </button>
+                            <button class="bg-darker hover:bg-accent/30 border border-gray-light rounded-lg p-3 font-bold transition-colors">
+                                100.000 ₫
+                            </button>
+                            <button class="bg-darker hover:bg-accent/30 border border-gray-light rounded-lg p-3 font-bold transition-colors">
+                                200.000 ₫
+                            </button>
+                            <button class="bg-darker hover:bg-accent/30 border border-gray-light rounded-lg p-3 font-bold transition-colors">
+                                500.000 ₫
+                            </button>
+                            <button class="bg-darker hover:bg-accent/30 border border-gray-light rounded-lg p-3 font-bold transition-colors col-span-2">
+                                Số tiền khác...
+                            </button>
+                        </div>
+
+                        <h4 class="font-bold mb-3 text-white">Nội dung chuyển khoản</h4>
+                        <div class="bg-darker p-3 rounded-lg mb-3 border border-gray-light/50">
+                            <p class="text-gray-300 text-sm">Nội dung:</p>
+                            <p class="font-mono text-accent-light font-bold text-lg">POGHAZI + Tên tài khoản</p>
+                        </div>
+                        
+                        <h4 class="font-bold mb-3 text-white">Thông tin nhận tiền</h4>
+                        <div class="bg-darker p-3 rounded-lg mb-3 border border-gray-light/50">
+                            <p class="text-white font-medium">Người nhận: <span class="text-accent-light font-bold">LÊ HOÀNG PHONG</span></p>
+                            <p class="text-gray-300 text-sm mt-1">Hỗ trợ ZaloPay & các ngân hàng khác</p>
+                        </div>
+                        
+                        <p class="text-gray-200 font-medium">Sau khi thanh toán, hệ thống sẽ tự động ghi nhận & cộng số dư ✅</p>
+                    </div>
+
+                    <div class="flex flex-col items-center justify-center">
+                        <h4 class="font-bold mb-3 text-white">Quét mã QR ZaloPay</h4>
+                        <div class="bg-white p-4 rounded-lg mb-3 shadow-lg">
+                            <!-- QR CODE CỦA BẠN - Lưu ảnh vào điện thoại rồi thay link bên dưới -->
+                            <img src="file:///storage/emulated/0/Download/qr-poghazi.jpg" alt="QR ZaloPay Lê Hoàng Phong" class="w-48 h-48 rounded-lg">
+                        </div>
+                        <p class="text-gray-200 font-medium text-center">LÊ HOÀNG PHONG</p>
+                        <p class="text-gray-300 text-xs mt-1">Quét bằng ZaloPay hoặc ứng dụng ngân hàng</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- DỊCH VỤ NỔI BẬT -->
+            <section class="mb-8">
+                <h3 class="text-xl font-bold mb-4 text-white">🔥 Dịch vụ nổi bật</h3>
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                    <div class="card bg-gray rounded-xl p-5 transition-all duration-300 hover:shadow-lg hover:shadow-accent/20 border border-gray-light/50">
+                        <div class="w-12 h-12 bg-accent/30 rounded-lg flex items-center justify-center mb-3">
+                            <i class="fa fa-gamepad text-xl text-accent-light"></i>
+                        </div>
+                        <h4 class="font-bold text-lg mb-2 text-white">Roblox</h4>
+                        <p class="text-gray-200 text-base mb-3">Cày cấp, farm vật phẩm, hỗ trợ tài khoản</p>
+                        <a href="#roblox" class="inline-block text-accent-light font-bold hover:underline">Xem chi tiết →</a>
+                    </div>
+
+                    <div class="card bg-gray rounded-xl p-5 transition-all duration-300 hover:shadow-lg hover:shadow-green-500/20 border border-gray-light/50">
+                        <div class="w-12 h-12 bg-green-500/30 rounded-lg flex items-center justify-center mb-3">
+                            <i class="fa fa-tasks text-xl text-green-400"></i>
+                        </div>
+                        <h4 class="font-bold text-lg mb-2 text-white">Cày thuê</h4>
+                        <p class="text-gray-200 text-base mb-3">Đánh thuê, leo rank, hoàn thành nhiệm vụ</p>
+                        <a href="#cay-thue" class="inline-block text-green-400 font-bold hover:underline">Xem chi tiết →</a>
+                    </div>
+
+                    <div class="card bg-gray rounded-xl p-5 transition-all duration-300 hover:shadow-lg hover:shadow-pink-500/20 border border-gray-light/50">
+                        <div class="w-12 h-12 bg-pink-500/30 rounded-lg flex items-center justify-center mb-3">
+                            <i class="fa fa-users text-xl text-pink-400"></i>
+                        </div>
+                        <h4 class="font-bold text-lg mb-2 text-white">Social Media</h4>
+                        <p class="text-gray-200 text-base mb-3">TikTok, YouTube, FB, IG — Tăng tương tác</p>
+                        <a href="#tiktok" class="inline-block text-pink-400 font-bold hover:underline">Xem chi tiết →</a>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ADMIN PANEL -->
+            <section class="bg-gray rounded-xl p-6 border border-gray-light/50" id="admin">
+                <h3 class="text-xl font-bold mb-4 text-white">🛠️ Trang Quản Trị</h3>
+                <p class="text-gray-200 mb-4 font-medium">Đăng nhập với quyền quản trị để sử dụng đầy đủ chức năng:</p>
+                
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                    <div class="bg-darker p-3 rounded-lg border border-gray-light/50">
+                        <i class="fa fa-plus-circle text-green-400 mr-2"></i>
+                        <span class="font-medium">Thêm/sửa/xóa dịch vụ</span>
+                    </div>
+                    <div class="bg-darker p-3 rounded-lg border border-gray-light/50">
+                        <i class="fa fa-tag text-yellow-400 mr-2"></i>
+                        <span class="font-medium">Thay đổi giá</span>
+                    </div>
+                    <div class="bg-darker p-3 rounded-lg border border-gray-light/50">
+                        <i class="fa fa-shopping-cart text-blue-400 mr-2"></i>
+                        <span class="font-medium">Quản lý đơn hàng</span>
+                    </div>
+                    <div class="bg-darker p-3 rounded-lg border border-gray-light/50">
+                        <i class="fa fa-users text-purple-400 mr-2"></i>
+                        <span class="font-medium">Quản lý người dùng</span>
+                    </div>
+                    <div class="bg-darker p-3 rounded-lg border border-gray-light/50">
+                        <i class="fa fa-money text-green-400 mr-2"></i>
+                        <span class="font-medium">Quản lý nạp tiền</span>
+                    </div>
+                    <div class="bg-darker p-3 rounded-lg border border-gray-light/50">
+                        <i class="fa fa-bar-chart text-accent-light mr-2"></i>
+                        <span class="font-medium">Xem doanh thu</span>
+                    </div>
+                    <div class="bg-darker p-3 rounded-lg border border-gray-light/50">
+                        <i class="fa fa-refresh text-orange-400 mr-2"></i>
+                        <span class="font-medium">Cập nhật trạng thái đơn</span>
+                    </div>
+                </div>
+            </section>
+
+            <!-- FOOTER -->
+            <footer class="mt-10 pt-6 border-t border-gray-light/50 text-center">
+                <p class="text-white font-bold">© 2026 POGHAZI — Shop Dịch Vụ Game & Social Media</p>
+                <p class="mt-2 text-gray-200 font-medium">Hỗ trợ 24/7 • Uy tín • An toàn • Nhanh chóng</p>
+            </footer>
+        </main>
+    </div>
+
+    <script>
+        const menuToggle = document.getElementById('menuToggle');
+        const sidebar = document.getElementById('sidebar');
+        
+        menuToggle.addEventListener('click', () => {
+            sidebar.classList.toggle('hidden');
+            sidebar.classList.toggle('absolute');
+            sidebar.classList.toggle('z-50');
+            sidebar.classList.toggle('h-full');
+        });
+
+        document.querySelectorAll('a[href^="#"]').forEach(link => {
+            link.addEventListener('click', function() {
+                if (window.innerWidth < 768) {
+                    sidebar.classList.add('hidden');
+                }
+            });
+        });
+    </script>
+</body>
+</html>
