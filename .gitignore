@@ -1,0 +1,7 @@
+backend/node_modules/
+backend/poghazi-data.json
+frontend/index.html.backup-admin
+frontend/index.html.backup-url
+frontend/index.html.backup-url2
+frontend/index_backup.html
+frontend/check.js

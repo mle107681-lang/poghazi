@@ -1,0 +1,4822 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>POGHAZI - Dịch vụ số</title>
+
+<style>
+*{
+    box-sizing:border-box;
+    margin:0;
+    padding:0;
+}
+
+:root{
+    --bg:#07080d;
+    --card:#10121a;
+    --card2:#151823;
+    --border:#252936;
+    --text:#f5f7fb;
+    --muted:#8d94a5;
+    --primary:#7c5cff;
+    --primary2:#9a7cff;
+    --success:#22c55e;
+    --danger:#ef4444;
+    --warning:#f59e0b;
+}
+
+body{
+    font-family:Arial,Helvetica,sans-serif;
+    background:
+        radial-gradient(circle at top right,rgba(124,92,255,.12),transparent 35%),
+        var(--bg);
+    color:var(--text);
+    min-height:100vh;
+}
+
+button,input,select,textarea{
+    font:inherit;
+}
+
+button{
+    cursor:pointer;
+}
+
+.hidden{
+    display:none!important;
+}
+
+/* HEADER */
+
+header{
+    position:sticky;
+    top:0;
+    z-index:100;
+    height:64px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding:0 18px;
+    background:rgba(7,8,13,.9);
+    backdrop-filter:blur(16px);
+    border-bottom:1px solid var(--border);
+}
+
+.logo{
+    font-size:23px;
+    font-weight:900;
+    letter-spacing:1px;
+}
+
+.logo span{
+    color:var(--primary2);
+}
+
+.header-right{
+    display:flex;
+    align-items:center;
+    gap:9px;
+}
+
+.balance-mini{
+    padding:8px 12px;
+    background:#131622;
+    border:1px solid var(--border);
+    border-radius:10px;
+    color:#dcd8ff;
+    font-size:13px;
+}
+
+.menu-btn{
+    width:40px;
+    height:40px;
+    border:1px solid var(--border);
+    background:#11131b;
+    color:white;
+    border-radius:10px;
+    font-size:20px;
+}
+
+/* SIDEBAR */
+
+.sidebar{
+    position:fixed;
+    top:64px;
+    left:0;
+    bottom:0;
+    width:250px;
+    background:#0b0d13;
+    border-right:1px solid var(--border);
+    padding:18px 12px;
+    z-index:90;
+    overflow-y:auto;
+    transition:.25s;
+}
+
+.nav-title{
+    color:#646b7b;
+    font-size:11px;
+    font-weight:bold;
+    margin:10px 10px 8px;
+    text-transform:uppercase;
+}
+
+.nav-item{
+    width:100%;
+    display:flex;
+    align-items:center;
+    gap:11px;
+    padding:12px;
+    margin-bottom:4px;
+    border-radius:10px;
+    color:#aeb4c2;
+    background:transparent;
+    border:0;
+    text-align:left;
+}
+
+.nav-item:hover,
+.nav-item.active{
+    color:white;
+    background:#171a25;
+}
+
+.nav-item.active{
+    border-left:3px solid var(--primary);
+}
+
+/* MAIN */
+
+main{
+    margin-left:250px;
+    padding:25px;
+    max-width:1400px;
+}
+
+.page{
+    display:none;
+}
+
+.page.active{
+    display:block;
+}
+
+.hero{
+    border:1px solid var(--border);
+    border-radius:18px;
+    padding:30px;
+    background:
+        radial-gradient(circle at 90% 20%,rgba(124,92,255,.2),transparent 35%),
+        linear-gradient(135deg,#11131c,#0c0e14);
+    margin-bottom:22px;
+}
+
+.hero h1{
+    font-size:32px;
+    margin-bottom:10px;
+}
+
+.hero h1 span{
+    color:var(--primary2);
+}
+
+.hero p{
+    color:var(--muted);
+    line-height:1.6;
+    max-width:700px;
+}
+
+.hero-buttons{
+    display:flex;
+    gap:10px;
+    margin-top:20px;
+    flex-wrap:wrap;
+}
+
+/* BUTTON */
+
+.btn{
+    border:0;
+    border-radius:10px;
+    padding:11px 16px;
+    color:white;
+    background:#202331;
+    transition:.2s;
+}
+
+.btn:hover{
+    transform:translateY(-1px);
+    filter:brightness(1.12);
+}
+
+.btn-primary{
+    background:linear-gradient(135deg,var(--primary),#6244e9);
+}
+
+.btn-success{
+    background:#15803d;
+}
+
+.btn-danger{
+    background:#991b1b;
+}
+
+.btn-warning{
+    background:#92400e;
+}
+
+.btn-small{
+    padding:7px 10px;
+    font-size:12px;
+}
+
+/* STATS */
+
+.stats{
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    gap:14px;
+    margin-bottom:22px;
+}
+
+.stat{
+    padding:18px;
+    border:1px solid var(--border);
+    background:var(--card);
+    border-radius:14px;
+}
+
+.stat-title{
+    color:var(--muted);
+    font-size:13px;
+    margin-bottom:8px;
+}
+
+.stat-value{
+    font-size:22px;
+    font-weight:bold;
+}
+
+/* SERVICES */
+
+.section-title{
+    font-size:21px;
+    margin-bottom:15px;
+}
+
+.category-tabs{
+    display:flex;
+    gap:8px;
+    overflow-x:auto;
+    padding-bottom:10px;
+    margin-bottom:16px;
+}
+
+.category-tabs::-webkit-scrollbar{
+    height:3px;
+}
+
+.category-tabs button{
+    white-space:nowrap;
+    padding:9px 13px;
+    background:#11141c;
+    color:#aeb4c2;
+    border:1px solid var(--border);
+    border-radius:9px;
+}
+
+.category-tabs button.active{
+    color:white;
+    background:#28213e;
+    border-color:#6244e9;
+}
+
+.search{
+    width:100%;
+    margin-bottom:18px;
+}
+
+.input,
+.select,
+.textarea{
+    width:100%;
+    background:#0d0f16;
+    color:white;
+    border:1px solid var(--border);
+    border-radius:10px;
+    padding:12px;
+    outline:none;
+}
+
+.input:focus,
+.select:focus,
+.textarea:focus{
+    border-color:var(--primary);
+}
+
+.services{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:14px;
+}
+
+.service{
+    background:var(--card);
+    border:1px solid var(--border);
+    border-radius:14px;
+    padding:17px;
+    transition:.2s;
+}
+
+.service:hover{
+    border-color:#3b4050;
+    transform:translateY(-2px);
+}
+
+.service.disabled{
+    opacity:.48;
+}
+
+.service-top{
+    display:flex;
+    justify-content:space-between;
+    gap:10px;
+}
+
+.service-name{
+    font-weight:bold;
+    line-height:1.4;
+}
+
+.badge{
+    font-size:10px;
+    padding:4px 7px;
+    border-radius:6px;
+    background:#14351f;
+    color:#5ee58a;
+    height:max-content;
+}
+
+.badge.off{
+    background:#321717;
+    color:#f87171;
+}
+
+.service-desc{
+    color:var(--muted);
+    font-size:12px;
+    margin:9px 0;
+    line-height:1.5;
+}
+
+.service-price{
+    font-size:17px;
+    font-weight:bold;
+    margin-bottom:4px;
+}
+
+.service-limit{
+    font-size:11px;
+    color:#6f7687;
+    margin-bottom:14px;
+}
+
+/* CARDS */
+
+.card{
+    background:var(--card);
+    border:1px solid var(--border);
+    border-radius:14px;
+    padding:20px;
+    margin-bottom:16px;
+}
+
+.card h3{
+    margin-bottom:14px;
+}
+
+.profile-grid{
+    display:grid;
+    grid-template-columns:repeat(2,1fr);
+    gap:12px;
+}
+
+.info-box{
+    background:#0c0e14;
+    border:1px solid var(--border);
+    border-radius:10px;
+    padding:14px;
+}
+
+.info-box small{
+    color:var(--muted);
+    display:block;
+    margin-bottom:6px;
+}
+
+/* TABLE */
+
+.table-wrap{
+    width:100%;
+    overflow-x:auto;
+}
+
+table{
+    width:100%;
+    border-collapse:collapse;
+    min-width:650px;
+}
+
+th,td{
+    text-align:left;
+    padding:12px;
+    border-bottom:1px solid var(--border);
+    font-size:13px;
+}
+
+th{
+    color:#8d94a5;
+    font-weight:normal;
+}
+
+td{
+    color:#e8eaf0;
+}
+
+.status{
+    display:inline-block;
+    padding:5px 8px;
+    border-radius:6px;
+    font-size:11px;
+}
+
+.status.pending{
+    background:#3b2b0d;
+    color:#fbbf24;
+}
+
+.status.processing{
+    background:#20294a;
+    color:#93c5fd;
+}
+
+.status.success{
+    background:#12351f;
+    color:#4ade80;
+}
+
+.status.cancel{
+    background:#3b1515;
+    color:#f87171;
+}
+
+/* FORMS */
+
+.form-group{
+    margin-bottom:14px;
+}
+
+.form-group label{
+    display:block;
+    color:#aeb4c2;
+    font-size:13px;
+    margin-bottom:7px;
+}
+
+.form-grid{
+    display:grid;
+    grid-template-columns:repeat(2,1fr);
+    gap:12px;
+}
+
+.help{
+    color:#737a8b;
+    font-size:11px;
+    margin-top:5px;
+}
+
+/* DEPOSIT */
+
+.qr-box{
+    max-width:320px;
+    margin:15px auto;
+    padding:15px;
+    background:white;
+    border-radius:12px;
+    text-align:center;
+}
+
+.qr-box img{
+    width:100%;
+    display:block;
+}
+
+.deposit-info{
+    background:#11141c;
+    border:1px solid var(--border);
+    border-radius:10px;
+    padding:14px;
+    line-height:1.8;
+    font-size:13px;
+}
+
+/* MODAL */
+
+.modal{
+    position:fixed;
+    inset:0;
+    z-index:300;
+    display:none;
+    align-items:center;
+    justify-content:center;
+    background:rgba(0,0,0,.7);
+    padding:15px;
+}
+
+.modal.show{
+    display:flex;
+}
+
+.modal-box{
+    width:100%;
+    max-width:520px;
+    max-height:90vh;
+    overflow-y:auto;
+    background:#10121a;
+    border:1px solid #303441;
+    border-radius:16px;
+    padding:20px;
+    box-shadow:0 20px 80px rgba(0,0,0,.6);
+}
+
+.modal-head{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    margin-bottom:18px;
+}
+
+.close{
+    background:transparent;
+    border:0;
+    color:#aaa;
+    font-size:25px;
+}
+
+/* TOAST */
+
+.toast{
+    position:fixed;
+    right:18px;
+    bottom:18px;
+    z-index:1200;
+    max-width:330px;
+    padding:13px 16px;
+    background:#181b25;
+    border:1px solid #343947;
+    border-radius:10px;
+    box-shadow:0 10px 40px rgba(0,0,0,.5);
+    transform:translateY(120px);
+    opacity:0;
+    transition:.3s;
+}
+
+.toast.show{
+    transform:translateY(0);
+    opacity:1;
+}
+
+.toast.success{
+    border-color:#166534;
+}
+
+.toast.error{
+    border-color:#991b1b;
+}
+
+/* LOGIN */
+
+.auth-screen{
+    position:fixed;
+    inset:0;
+    z-index:1000;
+    background:
+        radial-gradient(circle at 50% 20%,rgba(124,92,255,.16),transparent 40%),
+        #07080d;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:18px;
+}
+
+.auth-box{
+    width:100%;
+    max-width:420px;
+    background:#10121a;
+    border:1px solid var(--border);
+    border-radius:18px;
+    padding:25px;
+    box-shadow:0 20px 70px rgba(0,0,0,.5);
+}
+
+.auth-logo{
+    text-align:center;
+    font-size:30px;
+    font-weight:900;
+    margin-bottom:5px;
+}
+
+.auth-logo span{
+    color:var(--primary2);
+}
+
+.auth-sub{
+    text-align:center;
+    color:var(--muted);
+    font-size:13px;
+    margin-bottom:25px;
+}
+
+.auth-tabs{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    background:#0a0c11;
+    border-radius:10px;
+    padding:4px;
+    margin-bottom:20px;
+}
+
+.auth-tabs button{
+    padding:9px;
+    background:transparent;
+    border:0;
+    color:#777f90;
+    border-radius:8px;
+}
+
+.auth-tabs button.active{
+    background:#242033;
+    color:white;
+}
+
+.auth-form{
+    display:none;
+}
+
+.auth-form.active{
+    display:block;
+}
+
+/* EMPTY */
+
+.empty{
+    padding:35px 15px;
+    text-align:center;
+    color:#666e7f;
+}
+
+/* MOBILE */
+
+@media(max-width:900px){
+
+    .sidebar{
+        transform:translateX(-100%);
+    }
+
+    .sidebar.open{
+        transform:translateX(0);
+        box-shadow:20px 0 60px rgba(0,0,0,.5);
+    }
+
+    main{
+        margin-left:0;
+        padding:15px;
+    }
+
+    .services{
+        grid-template-columns:repeat(2,1fr);
+    }
+
+    .stats{
+        grid-template-columns:repeat(2,1fr);
+    }
+
+}
+
+@media(max-width:600px){
+
+    header{
+        padding:0 12px;
+    }
+
+    .logo{
+        font-size:20px;
+    }
+
+    .balance-mini{
+        font-size:11px;
+        padding:7px 8px;
+    }
+
+    main{
+        padding:12px;
+    }
+
+    .hero{
+        padding:20px;
+    }
+
+    .hero h1{
+        font-size:25px;
+    }
+
+    .services{
+        grid-template-columns:1fr;
+    }
+
+    .stats{
+        grid-template-columns:1fr 1fr;
+        gap:9px;
+    }
+
+    .stat{
+        padding:13px;
+    }
+
+    .stat-value{
+        font-size:18px;
+    }
+
+    .profile-grid,
+    .form-grid{
+        grid-template-columns:1fr;
+    }
+
+    .card{
+        padding:15px;
+    }
+
+}
+</style>
+</head>
+
+<body>
+
+<!-- AUTH -->
+
+<div id="authScreen" class="auth-screen">
+
+    <div class="auth-box">
+
+        <div class="auth-logo">
+            POG<span>HAZI</span>
+        </div>
+
+        <div class="auth-sub">
+            Dịch vụ game & mạng xã hội
+        </div>
+
+        <div class="auth-tabs">
+
+            <button
+                id="loginTab"
+                class="active"
+                onclick="showAuth('login')"
+            >
+                Đăng nhập
+            </button>
+
+            <button
+                id="registerTab"
+                onclick="showAuth('register')"
+            >
+                Đăng ký
+            </button>
+
+        </div>
+
+        <!-- LOGIN -->
+
+        <form
+            id="loginForm"
+            class="auth-form active"
+        >
+
+            <div class="form-group">
+
+                <label>Email</label>
+
+                <input
+                    id="loginEmail"
+                    class="input"
+                    type="email"
+                    placeholder="email@example.com"
+                    required
+                >
+
+            </div>
+
+            <div class="form-group">
+
+                <label>Mật khẩu</label>
+
+                <input
+                    id="loginPassword"
+                    class="input"
+                    type="password"
+                    placeholder="••••••••"
+                    required
+                >
+
+            </div>
+
+            <button
+                type="submit"
+                class="btn btn-primary"
+                style="width:100%"
+            >
+                Đăng nhập
+            </button>
+
+        </form>
+
+        <!-- REGISTER -->
+
+        <form
+            id="registerForm"
+            class="auth-form"
+        >
+
+            <div class="form-group">
+
+                <label>Email</label>
+
+                <input
+                    id="registerEmail"
+                    class="input"
+                    type="email"
+                    placeholder="email@example.com"
+                    required
+                >
+
+            </div>
+
+            <div class="form-group">
+
+                <label>Mật khẩu</label>
+
+                <input
+                    id="registerPassword"
+                    class="input"
+                    type="password"
+                    placeholder="Tối thiểu 6 ký tự"
+                    minlength="6"
+                    required
+                >
+
+            </div>
+
+            <div class="form-group">
+
+                <label>Nhập lại mật khẩu</label>
+
+                <input
+                    id="registerPassword2"
+                    class="input"
+                    type="password"
+                    placeholder="Nhập lại mật khẩu"
+                    minlength="6"
+                    required
+                >
+
+            </div>
+
+            <button
+                type="submit"
+                class="btn btn-primary"
+                style="width:100%"
+            >
+                Tạo tài khoản
+            </button>
+
+        </form>
+
+    </div>
+
+</div>
+
+
+<!-- HEADER -->
+
+<header>
+
+    <div class="logo">
+        POG<span>HAZI</span>
+    </div>
+
+    <div class="header-right">
+
+        <div class="balance-mini">
+            Số dư:
+            <strong id="headerBalance">0đ</strong>
+        </div>
+
+        <button
+            class="menu-btn"
+            onclick="toggleSidebar()"
+        >
+            ☰
+        </button>
+
+    </div>
+
+</header>
+
+
+<!-- SIDEBAR -->
+
+<aside
+    id="sidebar"
+    class="sidebar"
+>
+
+    <div class="nav-title">
+        Tổng quan
+    </div>
+
+    <button
+        class="nav-item active"
+        onclick="showPage('home',this)"
+    >
+        🏠 Trang chủ
+    </button>
+
+    <button
+        class="nav-item"
+        onclick="showPage('services',this)"
+    >
+        🛒 Dịch vụ
+    </button>
+
+    <div class="nav-title">
+        Tài khoản
+    </div>
+
+    <button
+        class="nav-item"
+        onclick="showPage('profile',this)"
+    >
+        👤 Tài khoản
+    </button>
+
+    <button
+        class="nav-item"
+        onclick="showPage('orders',this)"
+    >
+        📦 Đơn hàng
+    </button>
+
+    <button
+        class="nav-item"
+        onclick="showPage('transactions',this)"
+    >
+        💳 Lịch sử giao dịch
+    </button>
+
+    <button
+        class="nav-item"
+        onclick="showPage('deposit',this)"
+    >
+        💰 Nạp tiền
+    </button>
+
+    <button
+        id="adminNavButton"
+        class="nav-item"
+        style="display:none;"
+        onclick="showPage('admin',this); loadAdminDashboard();"
+    >
+        ⚙️ Quản trị Admin
+    </button>
+
+    <div class="nav-title">
+        Khác
+    </div>
+
+    <button
+        class="nav-item"
+        onclick="logout()"
+    >
+        🚪 Đăng xuất
+    </button>
+
+</aside>
+
+
+<!-- MAIN -->
+
+<main>
+
+    <!-- HOME -->
+
+    <section
+        id="page-home"
+        class="page active"
+    >
+
+        <div class="hero">
+
+            <h1>
+                Chào mừng đến
+                <span>POGHAZI</span>
+            </h1>
+
+            <p>
+                Hệ thống cung cấp dịch vụ mạng xã hội và dịch vụ game.
+                Đặt đơn nhanh chóng, quản lý số dư và theo dõi đơn hàng
+                ngay trên điện thoại.
+            </p>
+
+            <div class="hero-buttons">
+
+                <button
+                    class="btn btn-primary"
+                    onclick="showPageById('services')"
+                >
+                    🛒 Xem dịch vụ
+                </button>
+
+                <button
+                    class="btn"
+                    onclick="showPageById('deposit')"
+                >
+                    💰 Nạp tiền
+                </button>
+
+            </div>
+
+        </div>
+
+        <div class="stats">
+
+            <div class="stat">
+
+                <div class="stat-title">
+                    Số dư
+                </div>
+
+                <div
+                    class="stat-value"
+                    id="homeBalance"
+                >
+                    0đ
+                </div>
+
+            </div>
+
+            <div class="stat">
+
+                <div class="stat-title">
+                    Đơn hàng
+                </div>
+
+                <div
+                    class="stat-value"
+                    id="homeOrders"
+                >
+                    0
+                </div>
+
+            </div>
+
+            <div class="stat">
+
+                <div class="stat-title">
+                    Giao dịch
+                </div>
+
+                <div
+                    class="stat-value"
+                    id="homeTransactions"
+                >
+                    0
+                </div>
+
+            </div>
+
+            <div class="stat">
+
+                <div class="stat-title">
+                    Trạng thái
+                </div>
+
+                <div
+                    class="stat-value"
+                    style="color:#4ade80"
+                >
+                    Online
+                </div>
+
+            </div>
+
+        </div>
+
+        <div class="card">
+
+            <h3>
+                Dịch vụ nổi bật
+            </h3>
+
+            <div
+                id="featuredServices"
+                class="services"
+            ></div>
+
+        </div>
+
+    </section>
+
+
+    <!-- SERVICES -->
+
+    <section
+        id="page-services"
+        class="page"
+    >
+
+        <div class="card">
+
+            <h2 class="section-title">
+                🛒 Dịch vụ
+            </h2>
+
+            <input
+                id="serviceSearch"
+                class="input search"
+                placeholder="🔎 Tìm kiếm dịch vụ..."
+                oninput="renderServices()"
+            >
+
+            <div
+                id="categoryTabs"
+                class="category-tabs"
+            ></div>
+
+            <div
+                id="servicesList"
+                class="services"
+            ></div>
+
+        </div>
+
+    </section>
+
+
+    <!-- PROFILE -->
+
+    <section
+        id="page-profile"
+        class="page"
+    >
+
+        <div class="card">
+
+            <h2 class="section-title">
+                👤 Tài khoản
+            </h2>
+
+            <div class="profile-grid">
+
+                <div class="info-box">
+
+                    <small>Email</small>
+
+                    <strong id="profileEmail">
+                        -
+                    </strong>
+
+                </div>
+
+                <div class="info-box">
+
+                    <small>ID tài khoản</small>
+
+                    <strong id="profileId">
+                        -
+                    </strong>
+
+                </div>
+
+                <div class="info-box">
+
+                    <small>Số dư</small>
+
+                    <strong id="profileBalance">
+                        0đ
+                    </strong>
+
+                </div>
+
+                <div class="info-box">
+
+                    <small>Ngày đăng ký</small>
+
+                    <strong id="profileCreated">
+                        -
+                    </strong>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- ORDERS -->
+
+    <section
+        id="page-orders"
+        class="page"
+    >
+
+        <div class="card">
+
+            <h2 class="section-title">
+                📦 Đơn hàng của tôi
+            </h2>
+
+            <div class="table-wrap">
+
+                <table>
+
+                    <thead>
+
+                        <tr>
+                            <th>Mã đơn</th>
+                            <th>Dịch vụ</th>
+                            <th>Số lượng</th>
+                            <th>Giá</th>
+                            <th>Trạng thái</th>
+                            <th>Thời gian</th>
+                        </tr>
+
+                    </thead>
+
+                    <tbody id="ordersTable"></tbody>
+
+                </table>
+
+            </div>
+
+            <div
+                id="ordersEmpty"
+                class="empty hidden"
+            >
+                Bạn chưa có đơn hàng nào.
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- TRANSACTIONS -->
+
+    <section
+        id="page-transactions"
+        class="page"
+    >
+
+        <div class="card">
+
+            <h2 class="section-title">
+                💳 Lịch sử giao dịch
+            </h2>
+
+            <div class="table-wrap">
+
+                <table>
+
+                    <thead>
+
+                        <tr>
+                            <th>Mã</th>
+                            <th>Loại</th>
+                            <th>Số tiền</th>
+                            <th>Nội dung</th>
+                            <th>Thời gian</th>
+                        </tr>
+
+                    </thead>
+
+                    <tbody id="transactionsTable"></tbody>
+
+                </table>
+
+            </div>
+
+            <div
+                id="transactionsEmpty"
+                class="empty hidden"
+            >
+                Chưa có giao dịch.
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- DEPOSIT -->
+
+    <section
+        id="page-deposit"
+        class="page"
+    >
+
+        <div class="card">
+
+            <h2 class="section-title">
+                💰 Nạp tiền
+            </h2>
+
+            <div class="deposit-info">
+
+                <strong>
+                    Hướng dẫn nạp tiền
+                </strong>
+
+                <br>
+
+                1. Chuyển khoản đúng số tiền.
+
+                <br>
+
+                2. Nội dung chuyển khoản ghi đúng mã yêu cầu.
+
+                <br>
+
+                3. Sau khi chuyển khoản, chờ admin xác nhận.
+
+                <br>
+
+                4. Số dư sẽ được cộng sau khi yêu cầu được duyệt.
+
+            </div>
+
+            <br>
+
+            <form id="depositForm">
+
+                <div class="form-group">
+
+                    <label>
+                        Số tiền muốn nạp
+                    </label>
+
+                    <input
+                        id="depositAmount"
+                        class="input"
+                        type="number"
+                        min="1000"
+                        placeholder="Ví dụ: 50000"
+                        required
+                    >
+
+                </div>
+
+                <button
+                    type="submit"
+                    class="btn btn-primary"
+                >
+                    Tạo yêu cầu nạp tiền
+                </button>
+
+            </form>
+
+        </div>
+
+
+        <div class="card">
+
+            <h3>
+                Thông tin thanh toán
+            </h3>
+
+            <div class="qr-box">
+
+                <img
+                    src="zalopay-qr.png"
+                    alt="QR ZaloPay POGHAZI"
+                >
+
+            </div>
+
+            <div class="deposit-info">
+
+                <div>
+                    <strong>Ví:</strong>
+                    ZaloPay
+                </div>
+
+                <div>
+                    <strong>Số điện thoại:</strong>
+                    0776995170
+                </div>
+
+                <div>
+                    <strong>Chủ tài khoản:</strong>
+                    POGHAZI
+                </div>
+
+                <div>
+                    <strong>Lưu ý:</strong>
+                    Chỉ chuyển khoản sau khi tạo yêu cầu.
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div class="card">
+
+            <h3>
+                Yêu cầu nạp tiền của tôi
+            </h3>
+
+            <div class="table-wrap">
+
+                <table>
+
+                    <thead>
+
+                        <tr>
+                            <th>Mã</th>
+                            <th>Số tiền</th>
+                            <th>Nội dung</th>
+                            <th>Trạng thái</th>
+                            <th>Thời gian</th>
+                        </tr>
+
+                    </thead>
+
+                    <tbody id="depositTable"></tbody>
+
+                </table>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+
+    <!-- ADMIN DASHBOARD -->
+
+    <section
+        id="page-admin"
+        class="page"
+    >
+
+        <div class="hero">
+
+            <h1>
+                ⚙️ Quản trị <span>POGHAZI</span>
+            </h1>
+
+            <p>
+                Quản lý người dùng, nạp tiền, đơn hàng,
+                dịch vụ và doanh thu.
+            </p>
+
+        </div>
+
+
+        <!-- THỐNG KÊ -->
+
+        <div class="stats">
+
+            <div class="stat">
+                <div class="stat-title">Người dùng</div>
+                <div class="stat-value" id="adminUsersCount">0</div>
+            </div>
+
+            <div class="stat">
+                <div class="stat-title">Đơn hàng</div>
+                <div class="stat-value" id="adminOrdersCount">0</div>
+            </div>
+
+            <div class="stat">
+                <div class="stat-title">Doanh thu</div>
+                <div class="stat-value" id="adminRevenue">0đ</div>
+            </div>
+
+            <div class="stat">
+                <div class="stat-title">Chờ duyệt nạp</div>
+                <div class="stat-value" id="adminPendingDeposit">0</div>
+            </div>
+
+        </div>
+
+
+        <!-- YÊU CẦU NẠP -->
+
+        <div class="card" style="margin-top:20px;">
+
+            <h2>💰 Yêu cầu nạp tiền</h2>
+
+            <div id="adminDeposits">
+                Đang tải...
+            </div>
+
+        </div>
+
+
+        <!-- USERS -->
+
+        <div class="card" style="margin-top:20px;">
+
+            <h2>👥 Quản lý người dùng</h2>
+
+            <div id="adminUsers">
+                Đang tải...
+            </div>
+
+        </div>
+
+
+        <!-- ĐƠN HÀNG -->
+
+        <div class="card" style="margin-top:20px;">
+
+            <h2>📦 Quản lý đơn hàng</h2>
+
+            <div id="adminOrders">
+                Đang tải...
+            </div>
+
+        </div>
+
+
+        <!-- DỊCH VỤ -->
+
+        <div class="card" style="margin-top:20px;">
+
+            <h2>🛠️ Quản lý dịch vụ</h2>
+
+            <div id="adminServices">
+                Đang tải...
+            </div>
+
+        </div>
+
+    </section>
+
+</main>
+
+
+<!-- ORDER MODAL -->
+
+<div
+    id="orderModal"
+    class="modal"
+>
+
+    <div class="modal-box">
+
+        <div class="modal-head">
+
+            <h3>
+                Đặt dịch vụ
+            </h3>
+
+            <button
+                class="close"
+                onclick="closeOrderModal()"
+            >
+                ×
+            </button>
+
+        </div>
+
+        <form id="orderForm">
+
+            <input
+                id="orderServiceId"
+                type="hidden"
+            >
+
+            <div class="form-group">
+
+                <label>
+                    Dịch vụ
+                </label>
+
+                <input
+                    id="orderServiceName"
+                    class="input"
+                    readonly
+                >
+
+            </div>
+
+            <div class="form-group">
+
+                <label>
+                    Link / UID / thông tin đơn
+                </label>
+
+                <input
+                    id="orderLink"
+                    class="input"
+                    placeholder="Nhập link hoặc UID..."
+                    required
+                >
+
+                <div class="help">
+                    Nhập chính xác thông tin cần thực hiện.
+                </div>
+
+            </div>
+
+            <div class="form-group">
+
+                <label>
+                    Số lượng
+                </label>
+
+                <input
+                    id="orderQuantity"
+                    class="input"
+                    type="number"
+                    min="1"
+                    step="1"
+                    required
+                    oninput="calculateOrderPrice()"
+                >
+
+                <div
+                    id="orderLimit"
+                    class="help"
+                ></div>
+
+            </div>
+
+            <div class="form-group">
+
+                <label>
+                    Ghi chú
+                </label>
+
+                <textarea
+                    id="orderNote"
+                    class="textarea"
+                    rows="3"
+                    placeholder="Ghi chú thêm nếu cần..."
+                ></textarea>
+
+            </div>
+
+            <div
+                class="info-box"
+                style="margin-bottom:15px"
+            >
+
+                <small>
+                    Tổng tiền
+                </small>
+
+                <div
+                    id="orderTotal"
+                    style="
+                        font-size:24px;
+                        font-weight:bold;
+                        color:#a78bfa;
+                    "
+                >
+                    0đ
+                </div>
+
+            </div>
+
+            <button
+                id="orderSubmit"
+                type="submit"
+                class="btn btn-primary"
+                style="width:100%"
+            >
+                Xác nhận đặt đơn
+            </button>
+
+        </form>
+
+    </div>
+
+</div>
+
+
+<!-- TOAST -->
+
+<div
+    id="toast"
+    class="toast"
+></div>
+
+
+<script>
+
+/* ================================
+   CONFIG
+================================ */
+
+const API = "http://localhost:3000";
+
+let token =
+    localStorage.getItem("poghazi_token");
+
+let services = [];
+
+let account = null;
+
+let currentCategory = "Tất cả";
+
+let currentOrderService = null;
+
+
+/* ================================
+   HELPERS
+================================ */
+
+function money(value){
+
+    return new Intl.NumberFormat("vi-VN").format(
+        Number(value || 0)
+    ) + "đ";
+
+}
+
+
+function dateFormat(value){
+
+    if(!value) return "-";
+
+    const d = new Date(value);
+
+    if(isNaN(d.getTime()))
+        return value;
+
+    return d.toLocaleString("vi-VN");
+
+}
+
+
+function showToast(message,type=""){
+
+    const toast =
+        document.getElementById("toast");
+
+    if(!toast) return;
+
+    toast.textContent =
+        message || "Có lỗi xảy ra";
+
+    toast.className =
+        "toast show " + type;
+
+    setTimeout(()=>{
+
+        toast.className = "toast";
+
+    },3000);
+
+}
+
+
+async function api(path,options={}){
+
+    const headers = {
+
+        "Content-Type":
+            "application/json",
+
+        ...(options.headers || {})
+
+    };
+
+    if(token){
+
+        headers.Authorization =
+            "Bearer " + token;
+
+    }
+
+    let response;
+
+    try{
+
+        response = await fetch(
+            API + path,
+            {
+                ...options,
+                headers
+            }
+        );
+
+    }catch(error){
+
+        throw new Error(
+            "Không thể kết nối máy chủ. " +
+            "Hãy kiểm tra backend đang chạy ở cổng 3000."
+        );
+
+    }
+
+
+    let data;
+
+    try{
+
+        data =
+            await response.json();
+
+    }catch{
+
+        data = {};
+
+    }
+
+
+    if(!response.ok){
+
+        throw new Error(
+            data.message ||
+            data.error ||
+            `Máy chủ trả về lỗi HTTP ${response.status}`
+        );
+
+    }
+
+
+    return data;
+
+}
+
+
+/* ================================
+   AUTH UI
+================================ */
+
+function showAuth(type){
+
+    const loginTab =
+        document.getElementById("loginTab");
+
+    const registerTab =
+        document.getElementById("registerTab");
+
+    const loginForm =
+        document.getElementById("loginForm");
+
+    const registerForm =
+        document.getElementById("registerForm");
+
+
+    if(type === "login"){
+
+        loginTab.classList.add("active");
+        registerTab.classList.remove("active");
+
+        loginForm.classList.add("active");
+        registerForm.classList.remove("active");
+
+    }else{
+
+        loginTab.classList.remove("active");
+        registerTab.classList.add("active");
+
+        loginForm.classList.remove("active");
+        registerForm.classList.add("active");
+
+    }
+
+}
+
+
+/* ================================
+   LOGIN
+================================ */
+
+document
+.getElementById("loginForm")
+.addEventListener("submit",async e=>{
+
+    e.preventDefault();
+
+
+    const email =
+        document
+        .getElementById("loginEmail")
+        .value
+        .trim();
+
+
+    const password =
+        document
+        .getElementById("loginPassword")
+        .value;
+
+
+    if(!email || !password){
+
+        showToast(
+            "Vui lòng nhập đầy đủ email và mật khẩu.",
+            "error"
+        );
+
+        return;
+
+    }
+
+
+    const button =
+        e.submitter ||
+        document.querySelector(
+            "#loginForm button[type='submit']"
+        );
+
+
+    if(button){
+
+        button.disabled = true;
+
+        button.textContent =
+            "Đang đăng nhập...";
+
+    }
+
+
+    try{
+
+        const data =
+            await api(
+                "/api/dang-nhap",
+                {
+                    method:"POST",
+
+                    body:JSON.stringify({
+                        email,
+                        password
+                    })
+                }
+            );
+
+
+        token =
+            data.token ||
+            data.accessToken ||
+            data.jwt;
+
+
+        if(!token){
+
+            throw new Error(
+                "Đăng nhập thành công nhưng server không trả token."
+            );
+
+        }
+
+
+        localStorage.setItem(
+            "poghazi_token",
+            token
+        );
+
+
+        /*
+         * Tải dữ liệu sau khi đăng nhập.
+         */
+
+        try{
+
+            await startApp();
+
+
+            showToast(
+                "Đăng nhập thành công!",
+                "success"
+            );
+
+
+        }catch(error){
+
+            console.error(
+                "Lỗi tải dữ liệu sau đăng nhập:",
+                error
+            );
+
+
+            showToast(
+                "Đăng nhập thành công nhưng tải dữ liệu thất bại: " +
+                (error.message ||
+                "Lỗi không xác định"),
+                "error"
+            );
+
+        }
+
+
+    }catch(error){
+
+        console.error(
+            "Lỗi đăng nhập:",
+            error
+        );
+
+
+        showToast(
+            error.message ||
+            "Không thể đăng nhập.",
+            "error"
+        );
+
+
+    }finally{
+
+        if(button){
+
+            button.disabled = false;
+
+            button.textContent =
+                "Đăng nhập";
+
+        }
+
+    }
+
+});
+
+
+/* ================================
+   REGISTER
+================================ */
+
+document
+.getElementById("registerForm")
+.addEventListener("submit",async e=>{
+
+    e.preventDefault();
+
+
+    const email =
+        document
+        .getElementById("registerEmail")
+        .value
+        .trim();
+
+
+    const password =
+        document
+        .getElementById("registerPassword")
+        .value;
+
+
+    const password2 =
+        document
+        .getElementById("registerPassword2")
+        .value;
+
+
+    if(password !== password2){
+
+        showToast(
+            "Mật khẩu nhập lại không giống nhau.",
+            "error"
+        );
+
+        return;
+
+    }
+
+
+    try{
+
+        await api(
+            "/api/dang-ky",
+            {
+                method:"POST",
+
+                body:JSON.stringify({
+                    email,
+                    password
+                })
+            }
+        );
+
+
+        showToast(
+            "Đăng ký thành công! Hãy đăng nhập.",
+            "success"
+        );
+
+
+        document
+        .getElementById("loginEmail")
+        .value = email;
+
+
+        document
+        .getElementById("loginPassword")
+        .value = "";
+
+
+        showAuth("login");
+
+
+    }catch(error){
+
+        showToast(
+            error.message ||
+            "Không thể đăng ký.",
+            "error"
+        );
+
+    }
+
+});
+
+
+/* ================================
+   START APP
+================================ */
+
+async function startApp(){
+
+    if(!token){
+
+        document
+        .getElementById("authScreen")
+        .classList.remove("hidden");
+
+        return;
+
+    }
+
+
+    try{
+
+        await loadAccount();
+
+        await loadServices();
+
+        await loadOrders();
+
+        await loadTransactions();
+
+        await loadDeposits();
+
+
+        document
+        .getElementById("authScreen")
+        .classList.add("hidden");
+
+
+    }catch(error){
+
+        console.error(
+            "Lỗi startApp:",
+            error
+        );
+
+
+        const message =
+            String(
+                error.message || ""
+            ).toLowerCase();
+
+
+        if(
+            message.includes("token") ||
+            message.includes("unauthorized") ||
+            message.includes("401") ||
+            message.includes("đăng nhập")
+        ){
+
+            logout(false);
+
+
+            showToast(
+                "Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.",
+                "error"
+            );
+
+        }else{
+
+            /*
+             * Không logout nếu chỉ một API
+             * dữ liệu bị lỗi.
+             */
+
+            throw error;
+
+        }
+
+    }
+
+}
+
+
+/* ================================
+   ACCOUNT
+================================ */
+
+async function loadAccount(){
+
+    const data =
+        await api(
+            "/api/thong-tin-tai-khoan"
+        );
+
+
+    account =
+        data.user ||
+        data.tai_khoan ||
+        data;
+
+    updateAdminButton();
+
+
+    const balance =
+        account.balance ??
+        account.so_du ??
+        account.sodu ??
+        account.soDu ??
+        0;
+
+
+    document
+    .getElementById("headerBalance")
+    .textContent =
+        money(balance);
+
+
+    document
+    .getElementById("homeBalance")
+    .textContent =
+        money(balance);
+
+
+    document
+    .getElementById("profileBalance")
+    .textContent =
+        money(balance);
+
+
+    document
+    .getElementById("profileEmail")
+    .textContent =
+        account.email || "-";
+
+
+    document
+    .getElementById("profileId")
+    .textContent =
+        account.id ??
+        account.ma ??
+        account.userId ??
+        "-";
+
+
+    document
+    .getElementById("profileCreated")
+    .textContent =
+        dateFormat(
+            account.created_at ||
+            account.createdAt ||
+            account.ngay_tao
+        );
+
+}
+
+
+/* ================================
+   SERVICES
+================================ */
+
+async function loadServices(){
+
+    const data =
+        await api("/api/dich-vu");
+
+
+    services =
+        data.services ||
+        data.dich_vu ||
+        data.dichVu ||
+        data;
+
+
+    if(!Array.isArray(services)){
+
+        services = [];
+
+    }
+
+
+    buildCategories();
+
+    renderServices();
+
+    renderFeatured();
+
+}
+
+
+function serviceCategory(service){
+
+    const id =
+        String(
+            service.ma ||
+            service.code ||
+            service.slug ||
+            service.id ||
+            ""
+        ).toLowerCase();
+
+
+    if(id.startsWith("tiktok"))
+        return "TikTok";
+
+    if(id.startsWith("facebook"))
+        return "Facebook";
+
+    if(id.startsWith("youtube"))
+        return "YouTube";
+
+    if(id.startsWith("instagram"))
+        return "Instagram";
+
+    if(id.startsWith("threads"))
+        return "Threads";
+
+    if(id.startsWith("google"))
+        return "Google";
+
+    if(
+        id.startsWith("roblox") ||
+        id.startsWith("king-legacy") ||
+        id.startsWith("pet-simulator")
+    )
+        return "Roblox";
+
+
+    return "Khác";
+
+}
+
+
+function serviceName(service){
+
+    return (
+        service.ten ||
+        service.name ||
+        service.ten_dich_vu ||
+        service.title ||
+        "Dịch vụ"
+    );
+
+}
+
+
+function serviceId(service){
+
+    return (
+        service.id ??
+        service.ma ??
+        service.code ??
+        service.slug
+    );
+
+}
+
+
+function servicePrice(service){
+
+    return Number(
+        service.gia ??
+        service.price ??
+        service.don_gia ??
+        0
+    );
+
+}
+
+
+function serviceMin(service){
+
+    return Number(
+        service.min ??
+        service.min_quantity ??
+        service.so_luong_min ??
+        1
+    );
+
+}
+
+
+function serviceMax(service){
+
+    return Number(
+        service.max ??
+        service.max_quantity ??
+        service.so_luong_max ??
+        999999999
+    );
+
+}
+
+
+function serviceActive(service){
+
+    if(
+        service.hoat_dong === false ||
+        service.active === false ||
+        service.is_active === false
+    ){
+
+        return false;
+
+    }
+
+
+    return true;
+
+}
+
+
+function buildCategories(){
+
+    const container =
+        document.getElementById(
+            "categoryTabs"
+        );
+
+
+    const categories =
+        [
+            "Tất cả",
+            ...new Set(
+                services.map(
+                    serviceCategory
+                )
+            )
+        ];
+
+
+    container.innerHTML =
+        categories
+        .map(category=>`
+
+            <button
+                class="${
+                    category === currentCategory
+                    ? "active"
+                    : ""
+                }"
+                onclick="setCategory('${escapeAttr(category)}')"
+            >
+                ${escapeHtml(category)}
+            </button>
+
+        `)
+        .join("");
+
+}
+
+
+function setCategory(category){
+
+    currentCategory =
+        category;
+
+    buildCategories();
+
+    renderServices();
+
+}
+
+
+function renderServices(){
+
+    const container =
+        document.getElementById(
+            "servicesList"
+        );
+
+
+    const search =
+        document
+        .getElementById(
+            "serviceSearch"
+        )
+        .value
+        .toLowerCase()
+        .trim();
+
+
+    let list =
+        services.filter(service=>{
+
+            const category =
+                serviceCategory(service);
+
+
+            const matchCategory =
+                currentCategory === "Tất cả" ||
+                category === currentCategory;
+
+
+            const name =
+                serviceName(service)
+                .toLowerCase();
+
+
+            const matchSearch =
+                !search ||
+                name.includes(search) ||
+                category
+                    .toLowerCase()
+                    .includes(search);
+
+
+            return (
+                matchCategory &&
+                matchSearch
+            );
+
+        });
+
+
+    if(!list.length){
+
+        container.innerHTML = `
+            <div class="empty">
+                Không tìm thấy dịch vụ.
+            </div>
+        `;
+
+        return;
+
+    }
+
+
+    container.innerHTML =
+        list
+        .map(service=>serviceCard(service))
+        .join("");
+
+}
+
+
+function serviceCard(service){
+
+    const active =
+        serviceActive(service);
+
+
+    const price =
+        servicePrice(service);
+
+
+    const min =
+        serviceMin(service);
+
+
+    const max =
+        serviceMax(service);
+
+
+    /*
+     * Lưu service vào biến toàn cục theo ID.
+     * Cách này an toàn hơn việc nhét JSON
+     * trực tiếp vào onclick.
+     */
+
+    const sid =
+        String(serviceId(service));
+
+
+    window.__poghaziServices =
+        window.__poghaziServices || {};
+
+
+    window.__poghaziServices[sid] =
+        service;
+
+
+    return `
+
+        <div class="service ${
+            active ? "" : "disabled"
+        }">
+
+            <div class="service-top">
+
+                <div class="service-name">
+                    ${escapeHtml(
+                        serviceName(service)
+                    )}
+                </div>
+
+                <span class="badge ${
+                    active ? "" : "off"
+                }">
+                    ${
+                        active
+                        ? "Hoạt động"
+                        : "Tạm dừng"
+                    }
+                </span>
+
+            </div>
+
+
+            <div class="service-desc">
+                ${escapeHtml(
+                    serviceCategory(service)
+                )}
+            </div>
+
+
+            <div class="service-price">
+                ${
+                    price > 0
+                    ? money(price)
+                    : "Chưa có giá"
+                }
+            </div>
+
+
+            <div class="service-limit">
+                Min: ${formatNumber(min)}
+                •
+                Max: ${formatNumber(max)}
+            </div>
+
+
+            ${
+                active && price > 0
+                ?
+                `
+                <button
+                    class="btn btn-primary"
+                    style="width:100%"
+                    onclick="openOrderById('${escapeAttr(sid)}')"
+                >
+                    Đặt dịch vụ
+                </button>
+                `
+                :
+                `
+                <button
+                    class="btn"
+                    style="width:100%"
+                    disabled
+                >
+                    Không khả dụng
+                </button>
+                `
+            }
+
+        </div>
+
+    `;
+
+}
+
+
+function openOrderById(id){
+
+    const service =
+        window.__poghaziServices &&
+        window.__poghaziServices[
+            String(id)
+        ];
+
+
+    if(!service){
+
+        showToast(
+            "Không tìm thấy dịch vụ.",
+            "error"
+        );
+
+        return;
+
+    }
+
+
+    openOrder(service);
+
+}
+
+
+function renderFeatured(){
+
+    const container =
+        document.getElementById(
+            "featuredServices"
+        );
+
+
+    const list =
+        services
+        .filter(service=>
+            serviceActive(service) &&
+            servicePrice(service) > 0
+        )
+        .slice(0,6);
+
+
+    container.innerHTML =
+        list.length
+        ?
+        list
+        .map(service=>serviceCard(service))
+        .join("")
+        :
+        `<div class="empty">
+            Chưa có dịch vụ.
+        </div>`;
+
+}
+
+
+/* ================================
+   ORDER
+================================ */
+
+function openOrder(service){
+
+    currentOrderService =
+        service;
+
+
+    document
+    .getElementById("orderServiceId")
+    .value =
+        serviceId(service);
+
+
+    document
+    .getElementById("orderServiceName")
+    .value =
+        serviceName(service);
+
+
+    const quantity =
+        document.getElementById(
+            "orderQuantity"
+        );
+
+
+    quantity.min =
+        serviceMin(service);
+
+
+    quantity.max =
+        serviceMax(service);
+
+
+    quantity.value =
+        serviceMin(service);
+
+
+    document
+    .getElementById("orderLimit")
+    .textContent =
+        `Tối thiểu ${
+            formatNumber(
+                serviceMin(service)
+            )
+        } • Tối đa ${
+            formatNumber(
+                serviceMax(service)
+            )
+        }`;
+
+
+    document
+    .getElementById("orderLink")
+    .value = "";
+
+
+    document
+    .getElementById("orderNote")
+    .value = "";
+
+
+    calculateOrderPrice();
+
+
+    document
+    .getElementById("orderModal")
+    .classList.add("show");
+
+}
+
+
+function closeOrderModal(){
+
+    document
+    .getElementById("orderModal")
+    .classList.remove("show");
+
+
+    currentOrderService =
+        null;
+
+}
+
+
+function calculateOrderPrice(){
+
+    if(!currentOrderService)
+        return;
+
+
+    const quantity =
+        Number(
+            document
+            .getElementById(
+                "orderQuantity"
+            )
+            .value || 0
+        );
+
+
+    const price =
+        servicePrice(
+            currentOrderService
+        );
+
+
+    const total =
+        calculateServiceTotal(
+            price,
+            quantity,
+            currentOrderService
+        );
+
+
+    document
+    .getElementById("orderTotal")
+    .textContent =
+        money(total);
+
+}
+
+
+function calculateServiceTotal(
+    unitPrice,
+    quantity,
+    service
+){
+
+    const code =
+        String(
+            service.code ||
+            service.ma ||
+            service.slug ||
+            ""
+        ).toLowerCase();
+
+
+    if(
+        code.includes("youtube-view")
+    ){
+
+        return unitPrice *
+            (quantity / 1000);
+
+    }
+
+
+    if(
+        code.includes("youtube-watch")
+    ){
+
+        return unitPrice *
+            (quantity / 500);
+
+    }
+
+
+    if(
+        code.includes("threads-like")
+    ){
+
+        return unitPrice *
+            (quantity / 10);
+
+    }
+
+
+    if(
+        code.includes("instagram-like") ||
+        code.includes("instagram-follow")
+    ){
+
+        return unitPrice *
+            (quantity / 100);
+
+    }
+
+
+    if(
+        code.includes("tiktok-follow")
+    ){
+
+        return unitPrice *
+            (quantity / 100);
+
+    }
+
+
+    return unitPrice * quantity;
+
+}
+
+
+document
+.getElementById("orderForm")
+.addEventListener("submit",async e=>{
+
+    e.preventDefault();
+
+
+    if(!currentOrderService)
+        return;
+
+
+    const link =
+        document
+        .getElementById(
+            "orderLink"
+        )
+        .value
+        .trim();
+
+
+    const quantity =
+        Number(
+            document
+            .getElementById(
+                "orderQuantity"
+            )
+            .value
+        );
+
+
+    const note =
+        document
+        .getElementById(
+            "orderNote"
+        )
+        .value
+        .trim();
+
+
+    const min =
+        serviceMin(
+            currentOrderService
+        );
+
+
+    const max =
+        serviceMax(
+            currentOrderService
+        );
+
+
+    if(quantity < min || quantity > max){
+
+        showToast(
+            `Số lượng phải từ ${min} đến ${max}.`,
+            "error"
+        );
+
+        return;
+
+    }
+
+
+    const button =
+        document.getElementById(
+            "orderSubmit"
+        );
+
+
+    button.disabled = true;
+
+    button.textContent =
+        "Đang đặt đơn...";
+
+
+    try{
+
+        const service =
+            currentOrderService;
+
+
+        const data =
+            await api(
+                "/api/don-hang",
+                {
+                    method:"POST",
+
+                    body:JSON.stringify({
+                       dich_vu_id:
+                            serviceId(service),
+
+                        dich_vu:
+                            serviceId(service),
+
+                        service_id:
+                            serviceId(service),
+
+                        ma_dich_vu:
+                            serviceId(service),
+
+                        link,
+
+                        url:link,
+
+                        uid:link,
+
+                        so_luong:quantity,
+
+                        quantity,
+
+                        ghi_chu:note,
+
+                        note
+
+                    })
+                }
+            );
+
+
+        showToast(
+            data.message ||
+            "Đặt đơn thành công!",
+            "success"
+        );
+
+
+        closeOrderModal();
+
+
+        await loadAccount();
+
+        await loadOrders();
+
+        await loadTransactions();
+
+
+    }catch(error){
+
+        showToast(
+            error.message ||
+            "Không thể đặt đơn.",
+            "error"
+        );
+
+
+    }finally{
+
+        button.disabled = false;
+
+        button.textContent =
+            "Xác nhận đặt đơn";
+
+    }
+
+});
+
+
+/* ================================
+   ORDERS
+================================ */
+
+async function loadOrders(){
+
+    const data =
+        await api(
+            "/api/don-hang"
+        );
+
+
+    const orders =
+        data.orders ||
+        data.don_hang ||
+        data.donHang ||
+        data;
+
+
+    const list =
+        Array.isArray(orders)
+        ? orders
+        : [];
+
+
+    document
+    .getElementById(
+        "homeOrders"
+    )
+    .textContent =
+        list.length;
+
+
+    const tbody =
+        document.getElementById(
+            "ordersTable"
+        );
+
+
+    const empty =
+        document.getElementById(
+            "ordersEmpty"
+        );
+
+
+    if(!list.length){
+
+        tbody.innerHTML = "";
+
+        empty.classList.remove(
+            "hidden"
+        );
+
+        return;
+
+    }
+
+
+    empty.classList.add(
+        "hidden"
+    );
+
+
+    tbody.innerHTML =
+        list
+        .map(order=>{
+
+            const status =
+                order.trang_thai ||
+                order.status ||
+                "cho_xac_nhan";
+
+
+            return `
+
+                <tr>
+
+                    <td>
+                        #${escapeHtml(
+                            order.ma ||
+                            order.id ||
+                            "-"
+                        )}
+                    </td>
+
+                    <td>
+                        ${escapeHtml(
+                            order.ten_dich_vu ||
+                            order.service_name ||
+                            order.dich_vu ||
+                            "-"
+                        )}
+                    </td>
+
+                    <td>
+                        ${formatNumber(
+                            order.so_luong ??
+                            order.quantity ??
+                            0
+                        )}
+                    </td>
+
+                    <td>
+                        ${money(
+                            order.tong_tien ??
+                            order.total ??
+                            order.gia ??
+                            0
+                        )}
+                    </td>
+
+                    <td>
+                        ${statusBadge(status)}
+                    </td>
+
+                    <td>
+                        ${dateFormat(
+                            order.created_at ||
+                            order.createdAt ||
+                            order.ngay_tao
+                        )}
+                    </td>
+
+                </tr>
+
+            `;
+
+        })
+        .join("");
+
+}
+
+
+function statusBadge(status){
+
+    const map = {
+
+        cho_xac_nhan:[
+            "pending",
+            "Chờ xác nhận"
+        ],
+
+        dang_xu_ly:[
+            "processing",
+            "Đang xử lý"
+        ],
+
+        hoan_thanh:[
+            "success",
+            "Hoàn thành"
+        ],
+
+        da_huy:[
+            "cancel",
+            "Đã hủy"
+        ]
+
+    };
+
+
+    const item =
+        map[status] ||
+        ["pending",status];
+
+
+    return `
+        <span class="status ${item[0]}">
+            ${escapeHtml(item[1])}
+        </span>
+    `;
+
+}
+
+
+/* ================================
+   TRANSACTIONS
+================================ */
+
+async function loadTransactions(){
+
+    const data =
+        await api(
+            "/api/giao-dich"
+        );
+
+
+    const transactions =
+        data.transactions ||
+        data.giao_dich ||
+        data.lich_su ||
+        data;
+
+
+    const list =
+        Array.isArray(transactions)
+        ? transactions
+        : [];
+
+
+    document
+    .getElementById(
+        "homeTransactions"
+    )
+    .textContent =
+        list.length;
+
+
+    const tbody =
+        document.getElementById(
+            "transactionsTable"
+        );
+
+
+    const empty =
+        document.getElementById(
+            "transactionsEmpty"
+        );
+
+
+    if(!list.length){
+
+        tbody.innerHTML = "";
+
+        empty.classList.remove(
+            "hidden"
+        );
+
+        return;
+
+    }
+
+
+    empty.classList.add(
+        "hidden"
+    );
+
+
+    tbody.innerHTML =
+        list
+        .map(item=>{
+
+            const amount =
+                Number(
+                    item.so_tien ??
+                    item.amount ??
+                    item.gia_tri ??
+                    0
+                );
+
+
+            const type =
+                item.loai ||
+                item.type ||
+                "Giao dịch";
+
+
+            return `
+
+                <tr>
+
+                    <td>
+                        #${escapeHtml(
+                            item.id ??
+                            item.ma ??
+                            "-"
+                        )}
+                    </td>
+
+                    <td>
+                        ${escapeHtml(type)}
+                    </td>
+
+                    <td style="
+                        color:${
+                            amount >= 0
+                            ? "#4ade80"
+                            : "#f87171"
+                        }
+                    ">
+
+                        ${
+                            amount >= 0
+                            ? "+"
+                            : ""
+                        }
+
+                        ${money(amount)}
+
+                    </td>
+
+                    <td>
+                        ${escapeHtml(
+                            item.noi_dung ||
+                            item.description ||
+                            item.mo_ta ||
+                            "-"
+                        )}
+                    </td>
+
+                    <td>
+                        ${dateFormat(
+                            item.created_at ||
+                            item.createdAt ||
+                            item.ngay_tao
+                        )}
+                    </td>
+
+                </tr>
+
+            `;
+
+        })
+        .join("");
+
+}
+
+
+/* ================================
+   DEPOSIT
+================================ */
+
+document
+.getElementById("depositForm")
+.addEventListener("submit",async e=>{
+
+    e.preventDefault();
+
+
+    const amount =
+        Number(
+            document
+            .getElementById(
+                "depositAmount"
+            )
+            .value
+        );
+
+
+    if(amount < 1000){
+
+        showToast(
+            "Số tiền tối thiểu là 1.000đ.",
+            "error"
+        );
+
+        return;
+
+    }
+
+
+    const button =
+        e.submitter;
+
+
+    if(button){
+
+        button.disabled = true;
+
+        button.textContent =
+            "Đang tạo yêu cầu...";
+
+    }
+
+
+    try{
+
+        const data =
+            await api(
+                "/api/nap-tien/tao-yeu-cau",
+                {
+                    method:"POST",
+
+                    body:JSON.stringify({
+                        so_tien:amount,
+                        amount
+                    })
+                }
+            );
+
+
+        showToast(
+            data.message ||
+            "Đã tạo yêu cầu nạp tiền.",
+            "success"
+        );
+
+
+        document
+        .getElementById(
+            "depositAmount"
+        )
+        .value = "";
+
+
+        await loadDeposits();
+
+
+    }catch(error){
+
+        showToast(
+            error.message ||
+            "Không thể tạo yêu cầu nạp tiền.",
+            "error"
+        );
+
+
+    }finally{
+
+        if(button){
+
+            button.disabled = false;
+
+            button.textContent =
+                "Tạo yêu cầu nạp tiền";
+
+        }
+
+    }
+
+});
+
+
+async function loadDeposits(){
+
+    const data =
+        await api(
+            "/api/nap-tien/yeu-cau"
+        );
+
+
+    const deposits =
+        data.requests ||
+        data.yeu_cau ||
+        data.yeu_cau_nap_tien ||
+        data;
+
+
+    const list =
+        Array.isArray(deposits)
+        ? deposits
+        : [];
+
+
+    const tbody =
+        document.getElementById(
+            "depositTable"
+        );
+
+
+    if(!list.length){
+
+        tbody.innerHTML = `
+            <tr>
+                <td colspan="5">
+                    <div class="empty">
+                        Chưa có yêu cầu nạp tiền.
+                    </div>
+                </td>
+            </tr>
+        `;
+
+        return;
+
+    }
+
+
+    tbody.innerHTML =
+        list
+        .map(item=>{
+
+            const status =
+                item.trang_thai ||
+                item.status ||
+                "cho_duyet";
+
+
+            let statusText =
+                "Chờ duyệt";
+
+
+            let statusClass =
+                "pending";
+
+
+            if(
+                status === "da_duyet" ||
+                status === "approved"
+            ){
+
+                statusText =
+                    "Đã duyệt";
+
+                statusClass =
+                    "success";
+
+            }
+
+
+            if(
+                status === "tu_choi" ||
+                status === "rejected"
+            ){
+
+                statusText =
+                    "Từ chối";
+
+                statusClass =
+                    "cancel";
+
+            }
+
+
+            return `
+
+                <tr>
+
+                    <td>
+                        #${escapeHtml(
+                            item.id ??
+                            item.ma ??
+                            "-"
+                        )}
+                    </td>
+
+                    <td>
+                        ${money(
+                            item.so_tien ??
+                            item.amount ??
+                            0
+                        )}
+                    </td>
+
+                    <td>
+                        ${escapeHtml(
+                            item.noi_dung ||
+                            item.content ||
+                            "-"
+                        )}
+                    </td>
+
+                    <td>
+                        <span class="status ${statusClass}">
+                            ${statusText}
+                        </span>
+                    </td>
+
+                    <td>
+                        ${dateFormat(
+                            item.created_at ||
+                            item.createdAt ||
+                            item.ngay_tao
+                        )}
+                    </td>
+
+                </tr>
+
+            `;
+
+        })
+        .join("");
+
+}
+
+
+/* ================================
+   NAVIGATION
+================================ */
+
+function showPage(page,button){
+
+    document
+    .querySelectorAll(".page")
+    .forEach(item=>{
+
+        item.classList.remove(
+            "active"
+        );
+
+    });
+
+
+    const target =
+        document.getElementById(
+            "page-" + page
+        );
+
+
+    if(target){
+
+        target.classList.add(
+            "active"
+        );
+
+    }
+
+
+    document
+    .querySelectorAll(".nav-item")
+    .forEach(item=>{
+
+        item.classList.remove(
+            "active"
+        );
+
+    });
+
+
+    if(button){
+
+        button.classList.add(
+            "active"
+        );
+
+    }
+
+
+    closeSidebar();
+
+
+    window.scrollTo({
+        top:0,
+        behavior:"smooth"
+    });
+
+}
+
+
+function showPageById(page){
+
+    const button =
+        [...document.querySelectorAll(
+            ".nav-item"
+        )]
+        .find(item=>
+            item.getAttribute("onclick") &&
+            item
+            .getAttribute("onclick")
+            .includes(
+                "'" + page + "'"
+            )
+        );
+
+
+    showPage(
+        page,
+        button
+    );
+
+}
+
+
+function toggleSidebar(){
+
+    document
+    .getElementById("sidebar")
+    .classList.toggle("open");
+
+}
+
+
+function closeSidebar(){
+
+    document
+    .getElementById("sidebar")
+    .classList.remove("open");
+
+}
+
+
+/* ================================
+   LOGOUT
+================================ */
+
+function logout(showMessage=true){
+
+    token = null;
+
+    account = null;
+
+    services = [];
+
+    window.__poghaziServices = {};
+
+
+    localStorage.removeItem(
+        "poghazi_token"
+    );
+
+
+    document
+    .getElementById("authScreen")
+    .classList.remove(
+        "hidden"
+    );
+
+
+    showAuth("login");
+
+
+    if(showMessage){
+
+        showToast(
+            "Đã đăng xuất.",
+            "success"
+        );
+
+    }
+
+}
+
+
+/* ================================
+   FORMAT
+================================ */
+
+function formatNumber(value){
+
+    return new Intl.NumberFormat(
+        "vi-VN"
+    ).format(
+        Number(value || 0)
+    );
+
+}
+
+
+function escapeHtml(value){
+
+    return String(value ?? "")
+        .replace(/&/g,"&amp;")
+        .replace(/</g,"&lt;")
+        .replace(/>/g,"&gt;")
+        .replace(/"/g,"&quot;")
+        .replace(/'/g,"&#039;");
+
+}
+
+
+function escapeAttr(value){
+
+    return String(value ?? "")
+        .replace(/\\/g,"\\\\")
+        .replace(/'/g,"\\'");
+
+}
+
+
+/* ================================
+   MODAL CLICK OUTSIDE
+================================ */
+
+document
+.getElementById("orderModal")
+.addEventListener("click",e=>{
+
+    if(
+        e.target.id === "orderModal"
+    ){
+
+        closeOrderModal();
+
+    }
+
+});
+
+
+/* ================================
+   START
+================================ */
+
+startApp();
+
+
+
+/* =========================================================
+   POGHAZI ADMIN DASHBOARD
+   ========================================================= */
+
+function isAdmin(){
+
+    return !!(
+        account &&
+        (
+            Number(account.la_admin) === 1 ||
+            account.la_admin === true
+        )
+    );
+}
+
+
+function updateAdminButton(){
+
+    const button =
+        document.getElementById(
+            "adminNavButton"
+        );
+
+    if(!button) return;
+
+    button.style.display =
+        isAdmin()
+            ? ""
+            : "none";
+}
+
+
+/* =========================================================
+   ADMIN LOAD DASHBOARD
+   ========================================================= */
+
+async function loadAdminDashboard(){
+
+    if(!isAdmin()){
+
+        showToast(
+            "Bạn không có quyền Admin.",
+            "error"
+        );
+
+        return;
+    }
+
+    try{
+
+        await Promise.all([
+            loadAdminStats(),
+            loadAdminDeposits(),
+            loadAdminUsers(),
+            loadAdminOrders(),
+            loadAdminServices()
+        ]);
+
+    }catch(error){
+
+        console.error(
+            "Admin error:",
+            error
+        );
+
+        showToast(
+            error.message ||
+            "Không thể tải dữ liệu Admin.",
+            "error"
+        );
+    }
+}
+
+
+/* =========================================================
+   THỐNG KÊ
+   ========================================================= */
+
+async function loadAdminStats(){
+
+    const data =
+        await api(
+            "/api/admin/thong-ke"
+        );
+
+    const stats =
+        data.thong_ke || {};
+
+    document
+        .getElementById("adminUsersCount")
+        .textContent =
+            stats.tong_nguoi_dung ?? 0;
+
+    document
+        .getElementById("adminOrdersCount")
+        .textContent =
+            stats.tong_don_hang ?? 0;
+
+    document
+        .getElementById("adminRevenue")
+        .textContent =
+            money(
+                stats.tong_doanh_thu || 0
+            );
+
+    document
+        .getElementById("adminPendingDeposit")
+        .textContent =
+            stats.yeu_cau_nap_cho_duyet ?? 0;
+}
+
+
+/* =========================================================
+   YÊU CẦU NẠP TIỀN
+   ========================================================= */
+
+async function loadAdminDeposits(){
+
+    const box =
+        document.getElementById(
+            "adminDeposits"
+        );
+
+    const data =
+        await api(
+            "/api/admin/nap-tien"
+        );
+
+    const list =
+        data.yeu_cau || [];
+
+    if(!list.length){
+
+        box.innerHTML =
+            "<p>Chưa có yêu cầu nạp tiền.</p>";
+
+        return;
+    }
+
+    box.innerHTML =
+        list.map(item => {
+
+            const status =
+                item.trang_thai || "";
+
+            const amount =
+                Number(
+                    item.so_tien || 0
+                );
+
+            const pending =
+                status === "cho_duyet";
+
+            return `
+                <div
+                    style="
+                        padding:15px;
+                        margin:10px 0;
+                        border:1px solid rgba(255,255,255,.1);
+                        border-radius:12px;
+                    "
+                >
+
+                    <strong>
+                        #${item.id}
+                    </strong>
+
+                    <br>
+
+                    User ID:
+                    ${item.user_id}
+
+                    <br>
+
+                    Số tiền:
+                    <strong>
+                        ${money(amount)}
+                    </strong>
+
+                    <br>
+
+                    Trạng thái:
+                    <strong>
+                        ${status}
+                    </strong>
+
+                    ${
+                        pending
+                        ? `
+                            <div
+                                style="
+                                    display:flex;
+                                    gap:8px;
+                                    margin-top:12px;
+                                    flex-wrap:wrap;
+                                "
+                            >
+
+                                <button
+                                    class="btn btn-primary"
+                                    onclick="
+                                        adminDepositAction(
+                                            ${item.id},
+                                            'da_duyet'
+                                        )
+                                    "
+                                >
+                                    ✅ Duyệt
+                                </button>
+
+                                <button
+                                    class="btn"
+                                    onclick="
+                                        adminDepositAction(
+                                            ${item.id},
+                                            'tu_choi'
+                                        )
+                                    "
+                                >
+                                    ❌ Từ chối
+                                </button>
+
+                            </div>
+                        `
+                        : ""
+                    }
+
+                </div>
+            `;
+
+        }).join("");
+}
+
+
+async function adminDepositAction(
+    id,
+    status
+){
+
+    const confirmText =
+        status === "da_duyet"
+            ? "Duyệt yêu cầu nạp tiền này?"
+            : "Từ chối yêu cầu nạp tiền này?";
+
+    if(!confirm(confirmText)){
+        return;
+    }
+
+    try{
+
+        await api(
+            `/api/admin/nap-tien/${id}`,
+            {
+                method:"PUT",
+
+                body:JSON.stringify({
+                    trang_thai:status
+                })
+            }
+        );
+
+        showToast(
+            status === "da_duyet"
+                ? "Đã duyệt nạp tiền."
+                : "Đã từ chối nạp tiền.",
+            "success"
+        );
+
+        await loadAdminDashboard();
+        await loadAccount();
+
+    }catch(error){
+
+        showToast(
+            error.message,
+            "error"
+        );
+    }
+}
+
+
+/* =========================================================
+   USERS
+   ========================================================= */
+
+async function loadAdminUsers(){
+
+    const box =
+        document.getElementById(
+            "adminUsers"
+        );
+
+    const data =
+        await api(
+            "/api/admin/users"
+        );
+
+    const users =
+        data.users || [];
+
+    if(!users.length){
+
+        box.innerHTML =
+            "<p>Chưa có người dùng.</p>";
+
+        return;
+    }
+
+    box.innerHTML =
+        users.map(user => `
+
+            <div
+                style="
+                    padding:15px;
+                    margin:10px 0;
+                    border:1px solid rgba(255,255,255,.1);
+                    border-radius:12px;
+                "
+            >
+
+                <strong>
+                    #${user.id}
+                </strong>
+
+                <br>
+
+                ${escapeHtml(
+                    user.email || ""
+                )}
+
+                <br>
+
+                Số dư:
+                <strong>
+                    ${money(
+                        user.so_du || 0
+                    )}
+                </strong>
+
+                ${
+                    Number(user.la_admin) === 1
+                    ? `<br><strong>⚙️ ADMIN</strong>`
+                    : ""
+                }
+
+                ${
+                    Number(user.la_admin) !== 1
+                    ? `
+                        <div
+                            style="
+                                display:flex;
+                                gap:8px;
+                                margin-top:12px;
+                                flex-wrap:wrap;
+                            "
+                        >
+
+                            <button
+                                class="btn btn-primary"
+                                onclick="
+                                    adminAddMoney(
+                                        ${user.id}
+                                    )
+                                "
+                            >
+                                ➕ Cộng tiền
+                            </button>
+
+                            <button
+                                class="btn"
+                                onclick="
+                                    adminRemoveMoney(
+                                        ${user.id}
+                                    )
+                                "
+                            >
+                                ➖ Trừ tiền
+                            </button>
+
+                        </div>
+                    `
+                    : ""
+                }
+
+            </div>
+
+        `).join("");
+}
+
+
+async function adminAddMoney(userId){
+
+    const amount =
+        Number(
+            prompt(
+                "Nhập số tiền muốn cộng:"
+            )
+        );
+
+    if(
+        !Number.isFinite(amount) ||
+        amount <= 0
+    ){
+        return;
+    }
+
+    const reason =
+        prompt(
+            "Lý do:",
+            "Admin cộng tiền"
+        ) ||
+        "Admin cộng tiền";
+
+    try{
+
+        await api(
+            `/api/admin/users/${userId}/cong-tien`,
+            {
+                method:"PUT",
+
+                body:JSON.stringify({
+                    so_tien:amount,
+                    ly_do:reason
+                })
+            }
+        );
+
+        showToast(
+            "Đã cộng tiền.",
+            "success"
+        );
+
+        await loadAdminUsers();
+        await loadAdminStats();
+
+    }catch(error){
+
+        showToast(
+            error.message,
+            "error"
+        );
+    }
+}
+
+
+async function adminRemoveMoney(userId){
+
+    const amount =
+        Number(
+            prompt(
+                "Nhập số tiền muốn trừ:"
+            )
+        );
+
+    if(
+        !Number.isFinite(amount) ||
+        amount <= 0
+    ){
+        return;
+    }
+
+    const reason =
+        prompt(
+            "Lý do:",
+            "Admin trừ tiền"
+        ) ||
+        "Admin trừ tiền";
+
+    try{
+
+        await api(
+            `/api/admin/users/${userId}/tru-tien`,
+            {
+                method:"PUT",
+
+                body:JSON.stringify({
+                    so_tien:amount,
+                    ly_do:reason
+                })
+            }
+        );
+
+        showToast(
+            "Đã trừ tiền.",
+            "success"
+        );
+
+        await loadAdminUsers();
+        await loadAdminStats();
+
+    }catch(error){
+
+        showToast(
+            error.message,
+            "error"
+        );
+    }
+}
+
+
+/* =========================================================
+   ĐƠN HÀNG
+   ========================================================= */
+
+async function loadAdminOrders(){
+
+    const box =
+        document.getElementById(
+            "adminOrders"
+        );
+
+    const data =
+        await api(
+            "/api/don-hang"
+        );
+
+    const orders =
+        data.don_hang || [];
+
+    if(!orders.length){
+
+        box.innerHTML =
+            "<p>Chưa có đơn hàng.</p>";
+
+        return;
+    }
+
+    box.innerHTML =
+        orders.map(order => `
+
+            <div
+                style="
+                    padding:15px;
+                    margin:10px 0;
+                    border:1px solid rgba(255,255,255,.1);
+                    border-radius:12px;
+                "
+            >
+
+                <strong>
+                    ${escapeHtml(
+                        order.ma || ""
+                    )}
+                </strong>
+
+                <br>
+
+                ${escapeHtml(
+                    order.ten_dich_vu || ""
+                )}
+
+                <br>
+
+                User:
+                ${escapeHtml(
+                    order.email || ""
+                )}
+
+                <br>
+
+                URL:
+                <strong>
+                    ${escapeHtml(
+                        order.link ||
+                        order.url ||
+                        order.uid ||
+                        ""
+                    )}
+                </strong>
+
+                <br>
+
+                Số lượng:
+                ${order.so_luong}
+
+                <br>
+
+                Giá:
+                <strong>
+                    ${money(
+                        order.gia || 0
+                    )}
+                </strong>
+
+                <br>
+
+                Trạng thái:
+                <strong>
+                    ${escapeHtml(
+                        order.trang_thai || ""
+                    )}
+                </strong>
+
+                <div
+                    style="
+                        display:flex;
+                        gap:8px;
+                        margin-top:12px;
+                        flex-wrap:wrap;
+                    "
+                >
+
+                    <button
+                        class="btn"
+                        onclick="
+                            adminSetOrderStatus(
+                                '${String(order.ma || "").replace(/'/g,"\\\\'")}',
+                                'dang_xu_ly'
+                            )
+                        "
+                    >
+                        🔄 Đang xử lý
+                    </button>
+
+                    <button
+                        class="btn btn-primary"
+                        onclick="
+                            adminSetOrderStatus(
+                                '${String(order.ma || "").replace(/'/g,"\\\\'")}',
+                                'hoan_thanh'
+                            )
+                        "
+                    >
+                        ✅ Hoàn thành
+                    </button>
+
+                    <button
+                        class="btn"
+                        onclick="
+                            adminSetOrderStatus(
+                                '${String(order.ma || "").replace(/'/g,"\\\\'")}',
+                                'da_huy'
+                            )
+                        "
+                    >
+                        ❌ Hủy
+                    </button>
+
+                </div>
+
+            </div>
+
+        `).join("");
+}
+
+
+async function adminSetOrderStatus(
+    ma,
+    status
+){
+
+    try{
+
+        await api(
+            `/api/don-hang/${encodeURIComponent(ma)}/trang-thai`,
+            {
+                method:"PUT",
+
+                body:JSON.stringify({
+                    trang_thai:status
+                })
+            }
+        );
+
+        showToast(
+            "Đã cập nhật đơn hàng.",
+            "success"
+        );
+
+        await loadAdminOrders();
+        await loadAdminStats();
+
+    }catch(error){
+
+        showToast(
+            error.message,
+            "error"
+        );
+    }
+}
+
+
+/* =========================================================
+   DỊCH VỤ
+   ========================================================= */
+
+async function loadAdminServices(){
+
+    const box =
+        document.getElementById(
+            "adminServices"
+        );
+
+    const data =
+        await api(
+            "/api/admin/dich-vu"
+        );
+
+    const services =
+        data.dich_vu || [];
+
+    if(!services.length){
+
+        box.innerHTML =
+            "<p>Chưa có dịch vụ.</p>";
+
+        return;
+    }
+
+    box.innerHTML =
+        services.map(service => `
+
+            <div
+                style="
+                    padding:15px;
+                    margin:10px 0;
+                    border:1px solid rgba(255,255,255,.1);
+                    border-radius:12px;
+                "
+            >
+
+                <strong>
+                    ${escapeHtml(
+                        service.ten || ""
+                    )}
+                </strong>
+
+                <br>
+
+                ID:
+                ${escapeHtml(
+                    service.id || ""
+                )}
+
+                <br>
+
+                Giá:
+                ${service.gia}
+
+                <br>
+
+                Min:
+                ${service.min}
+
+                —
+                Max:
+                ${service.max}
+
+                <br>
+
+                Trạng thái:
+                ${
+                    service.hoat_dong
+                        ? "🟢 Đang bán"
+                        : "🔴 Tắt"
+                }
+
+                <div
+                    style="
+                        display:flex;
+                        gap:8px;
+                        margin-top:12px;
+                        flex-wrap:wrap;
+                    "
+                >
+
+                    <button
+                        class="btn"
+                        onclick="
+                            adminEditService(
+                                '${String(service.id || "").replace(/'/g,"\\\\'")}'
+                            )
+                        "
+                    >
+                        ✏️ Sửa
+                    </button>
+
+                    <button
+                        class="btn"
+                        onclick="
+                            adminToggleService(
+                                '${String(service.id || "").replace(/'/g,"\\\\'")}',
+                                ${!service.hoat_dong}
+                            )
+                        "
+                    >
+                        ${
+                            service.hoat_dong
+                                ? "🔴 Tắt"
+                                : "🟢 Bật"
+                        }
+                    </button>
+
+                </div>
+
+            </div>
+
+        `).join("");
+}
+
+
+async function adminEditService(id){
+
+    const data =
+        await api(
+            "/api/admin/dich-vu"
+        );
+
+    const service =
+        (data.dich_vu || [])
+        .find(
+            x => x.id === id
+        );
+
+    if(!service){
+
+        showToast(
+            "Không tìm thấy dịch vụ.",
+            "error"
+        );
+
+        return;
+    }
+
+    const gia =
+        prompt(
+            "Giá mới:",
+            service.gia
+        );
+
+    if(gia === null) return;
+
+    const min =
+        prompt(
+            "Min mới:",
+            service.min
+        );
+
+    if(min === null) return;
+
+    const max =
+        prompt(
+            "Max mới:",
+            service.max
+        );
+
+    if(max === null) return;
+
+    try{
+
+        await api(
+            `/api/admin/dich-vu/${encodeURIComponent(id)}`,
+            {
+                method:"PUT",
+
+                body:JSON.stringify({
+                    gia:Number(gia),
+                    min:Number(min),
+                    max:Number(max)
+                })
+            }
+        );
+
+        showToast(
+            "Đã cập nhật dịch vụ.",
+            "success"
+        );
+
+        await loadAdminServices();
+        await loadServices();
+
+    }catch(error){
+
+        showToast(
+            error.message,
+            "error"
+        );
+    }
+}
+
+
+async function adminToggleService(
+    id,
+    enabled
+){
+
+    try{
+
+        await api(
+            `/api/admin/dich-vu/${encodeURIComponent(id)}`,
+            {
+                method:"PUT",
+
+                body:JSON.stringify({
+                    hoat_dong:enabled
+                })
+            }
+        );
+
+        showToast(
+            enabled
+                ? "Đã bật dịch vụ."
+                : "Đã tắt dịch vụ.",
+            "success"
+        );
+
+        await loadAdminServices();
+        await loadServices();
+
+    }catch(error){
+
+        showToast(
+            error.message,
+            "error"
+        );
+    }
+}
+
+
+/* =========================================================
+   ESCAPE HTML
+   ========================================================= */
+
+function escapeHtml(value){
+
+    return String(value ?? "")
+        .replace(/&/g,"&amp;")
+        .replace(/</g,"&lt;")
+        .replace(/>/g,"&gt;")
+        .replace(/"/g,"&quot;")
+        .replace(/'/g,"&#039;");
+}
+
+</script>
+
+</body>
+</html>
