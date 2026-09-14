@@ -2258,6 +2258,39 @@ app.post('/api/color-dice/roll', auth, (req, res) => {
     }
 });
 
+// ================================
+// COLOR DICE - LỊCH SỬ
+// ================================
+
+app.get('/api/color-dice/history', auth, (req, res) => {
+    try {
+        const data = getDB();
+
+        if (!Array.isArray(data.lichsu_color_dice)) {
+            data.lichsu_color_dice = [];
+        }
+
+        const lichSu = data.lichsu_color_dice
+            .filter(x => x.user_id === req.user.id)
+            .slice(-30)
+            .reverse();
+
+        return res.json({
+            thanh_cong: true,
+            lich_su: lichSu
+        });
+
+    } catch (error) {
+        console.error('Lỗi lấy lịch sử Color Dice:', error);
+
+        return res.status(500).json({
+            thanh_cong: false,
+            thong_bao: 'Lỗi máy chủ'
+        });
+    }
+});
+
+
 /* =========================================================
    XỬ LÝ LỖI
    ========================================================= */
