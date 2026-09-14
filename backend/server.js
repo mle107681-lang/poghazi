@@ -1433,6 +1433,8 @@ app.get(
                         user.email,
                     so_du:
                         user.so_du,
+                    coin:
+                        Number(user.coin || 0),
                     la_admin:
                         user.la_admin,
                     ngay_tao:
@@ -1800,6 +1802,190 @@ app.put(
                 'Đã trừ tiền',
             so_du:
                 user.so_du
+        });
+    }
+);
+
+
+/* =========================================================
+   ADMIN - CỘNG COIN COLOR DICE
+   ========================================================= */
+
+app.put(
+    '/api/admin/users/:id/cong-coin',
+    auth,
+    admin,
+    (req, res) => {
+
+        const userId =
+            Number(req.params.id);
+
+        const soCoin =
+            Number(req.body.so_coin);
+
+        const lyDo =
+            String(
+                req.body.ly_do ||
+                'Admin cấp Coin'
+            ).trim();
+
+        if (
+            !Number.isInteger(soCoin) ||
+            soCoin <= 0
+        ) {
+            return res.status(400).json({
+                thanh_cong: false,
+                message:
+                    'Số Coin không hợp lệ'
+            });
+        }
+
+        const data = getDB();
+
+        const user =
+            data.users.find(
+                u =>
+                    Number(u.id) ===
+                    userId
+            );
+
+        if (!user) {
+            return res.status(404).json({
+                thanh_cong: false,
+                message:
+                    'Không tìm thấy tài khoản'
+            });
+        }
+
+        if (typeof user.coin !== 'number') {
+            user.coin = 0;
+        }
+
+        user.coin += soCoin;
+
+        if (!Array.isArray(data.lichsu_giao_dich)) {
+            data.lichsu_giao_dich = [];
+        }
+
+        data.lichsu_giao_dich.push({
+            id:
+                data.nextTransactionId++,
+            user_id:
+                user.id,
+            loai:
+                'admin_cong_coin',
+            so_tien:
+                soCoin,
+            noi_dung:
+                lyDo,
+            thoi_gian:
+                new Date().toISOString()
+        });
+
+        saveDB();
+
+        res.json({
+            thanh_cong: true,
+            message:
+                'Đã cấp Coin',
+            coin:
+                user.coin
+        });
+    }
+);
+
+
+/* =========================================================
+   ADMIN - TRỪ COIN COLOR DICE
+   ========================================================= */
+
+app.put(
+    '/api/admin/users/:id/tru-coin',
+    auth,
+    admin,
+    (req, res) => {
+
+        const userId =
+            Number(req.params.id);
+
+        const soCoin =
+            Number(req.body.so_coin);
+
+        const lyDo =
+            String(
+                req.body.ly_do ||
+                'Admin trừ Coin'
+            ).trim();
+
+        if (
+            !Number.isInteger(soCoin) ||
+            soCoin <= 0
+        ) {
+            return res.status(400).json({
+                thanh_cong: false,
+                message:
+                    'Số Coin không hợp lệ'
+            });
+        }
+
+        const data = getDB();
+
+        const user =
+            data.users.find(
+                u =>
+                    Number(u.id) ===
+                    userId
+            );
+
+        if (!user) {
+            return res.status(404).json({
+                thanh_cong: false,
+                message:
+                    'Không tìm thấy tài khoản'
+            });
+        }
+
+        if (typeof user.coin !== 'number') {
+            user.coin = 0;
+        }
+
+        if (user.coin < soCoin) {
+            return res.status(400).json({
+                thanh_cong: false,
+                message:
+                    'Coin của tài khoản không đủ'
+            });
+        }
+
+        user.coin -= soCoin;
+
+        if (!Array.isArray(data.lichsu_giao_dich)) {
+            data.lichsu_giao_dich = [];
+        }
+
+        data.lichsu_giao_dich.push({
+            id:
+                data.nextTransactionId++,
+            user_id:
+                user.id,
+            loai:
+                'admin_tru_coin',
+            so_tien:
+                -soCoin,
+            noi_dung:
+                lyDo,
+            thoi_gian:
+                new Date().toISOString()
+        });
+
+        saveDB();
+
+        res.json({
+            thanh_cong: true,
+            message:
+                'Đã trừ Coin',
+            coin:
+                user.coin
         });
     }
 );

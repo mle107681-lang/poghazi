@@ -4557,6 +4557,15 @@ async function loadAdminUsers(){
                     )}
                 </strong>
 
+                <br>
+
+                🪙 Coin Color Dice:
+                <strong>
+                    ${formatNumber(
+                        Number(user.coin || 0)
+                    )}
+                </strong>
+
                 ${
                     Number(user.la_admin) === 1
                     ? `<br><strong>⚙️ ADMIN</strong>`
@@ -4597,6 +4606,28 @@ async function loadAdminUsers(){
                                 ➖ Trừ tiền
                             </button>
 
+                            <button
+                                class="btn btn-primary"
+                                onclick="
+                                    adminAddCoin(
+                                        ${user.id}
+                                    )
+                                "
+                            >
+                                🪙 Cấp Coin
+                            </button>
+
+                            <button
+                                class="btn"
+                                onclick="
+                                    adminRemoveCoin(
+                                        ${user.id}
+                                    )
+                                "
+                            >
+                                🪙 Trừ Coin
+                            </button>
+
                         </div>
                     `
                     : ""
@@ -4606,6 +4637,115 @@ async function loadAdminUsers(){
 
         `).join("");
 }
+
+
+async function adminAddCoin(userId){
+
+    const amount =
+        Number(
+            prompt(
+                "Nhập số Coin muốn cấp:"
+            )
+        );
+
+    if(
+        !Number.isInteger(amount) ||
+        amount <= 0
+    ){
+        return;
+    }
+
+    const reason =
+        prompt(
+            "Lý do:",
+            "Admin cấp Coin"
+        ) ||
+        "Admin cấp Coin";
+
+    try{
+
+        await api(
+            `/api/admin/users/${userId}/cong-coin`,
+            {
+                method:"PUT",
+
+                body:JSON.stringify({
+                    so_coin:amount,
+                    ly_do:reason
+                })
+            }
+        );
+
+        showToast(
+            "Đã cấp Coin.",
+            "success"
+        );
+
+        await loadAdminUsers();
+
+    }catch(error){
+
+        showToast(
+            error.message,
+            "error"
+        );
+    }
+}
+
+
+async function adminRemoveCoin(userId){
+
+    const amount =
+        Number(
+            prompt(
+                "Nhập số Coin muốn trừ:"
+            )
+        );
+
+    if(
+        !Number.isInteger(amount) ||
+        amount <= 0
+    ){
+        return;
+    }
+
+    const reason =
+        prompt(
+            "Lý do:",
+            "Admin trừ Coin"
+        ) ||
+        "Admin trừ Coin";
+
+    try{
+
+        await api(
+            `/api/admin/users/${userId}/tru-coin`,
+            {
+                method:"PUT",
+
+                body:JSON.stringify({
+                    so_coin:amount,
+                    ly_do:reason
+                })
+            }
+        );
+
+        showToast(
+            "Đã trừ Coin.",
+            "success"
+        );
+
+        await loadAdminUsers();
+
+    }catch(error){
+
+        showToast(
+            error.message,
+            "error"
+        );
+    }
+}
+
 
 
 async function adminAddMoney(userId){
