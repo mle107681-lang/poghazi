@@ -740,6 +740,7 @@ app.post(
                 email: emailLower,
                 password: passwordHash,
                 so_du: 0,
+                coin: 1000,
                 la_admin: 0,
                 ngay_tao:
                     new Date().toISOString()
@@ -2062,7 +2063,11 @@ async function ensureAdmin() {
         data.nextDepositId =
             data.yeu_cau_nap_tien.length + 1;
     }
-
+data.users.forEach(user => {
+    if (typeof user.coin !== 'number') {
+        user.coin = 1000;
+    }
+});
     const exists =
         data.users.find(
             user =>
@@ -2117,6 +2122,141 @@ async function ensureAdmin() {
     );
 }
 
+
+
+
+
+
+// ================================
+// COLOR DICE - ROLL
+// ================================
+
+app.post('/api/color-dice/roll', auth, (req, res) => {
+    try {
+        const { color, bet } = req.body;
+
+        const colors = ['do', 'xanh_la', 'xanh_duong', 'vang', 'tim', 'cam'];
+
+        if (!colors.includes(color)) {
+            return res.status(400).json({
+                thanh_cong: false,
+                thong_bao: 'Màu không hợp lệ'
+            });
+        }
+
+        const cuoc = Number(bet);
+
+        if (!Number.isInteger(cuoc) || cuoc <= 0) {
+            return res.status(400).json({
+                thanh_cong: false,
+                thong_bao: 'Số Coin cược không hợp lệ'
+            });
+        }
+
+        const data = getDB();
+
+        const user = data.users.find(
+            u => u.id === req.user.id
+        );
+
+        if (!user) {
+            return res.status(404).json({
+                thanh_cong: false,
+                thong_bao: 'Không tìm thấy tài khoản'
+            });
+        }
+
+        if (typeof user.coin !== 'number') {
+            user.coin = 1000;
+        }
+
+        if (user.coin < cuoc) {
+            return res.status(400).json({
+                thanh_cong: false,
+                thong_bao: 'Không đủ Coin'
+            });
+        }
+
+        // Trừ cược trước
+        user.coin -= cuoc;
+
+        // Roll 4 xúc xắc
+        const ketQua = [];
+
+        for (let i = 0; i < 4; i++) {
+            const randomIndex = Math.floor(
+                Math.random() * colors.length
+            );
+
+            ketQua.push(colors[randomIndex]);
+        }
+
+        // Đếm số viên đúng màu người chơi chọn
+        const soDung = ketQua.filter(
+            c => c === color
+        ).length;
+
+        // Luật payout:
+        // 0 đúng  -> 0x
+        // 1 đúng  -> 2x
+        // 2 đúng  -> 1x
+        // 3 đúng  -> 2x
+        // 4 đúng  -> 2x
+
+        let heSo = 0;
+
+        if (soDung === 1) {
+            heSo = 2;
+        } else if (soDung === 2) {
+            heSo = 1;
+        } else if (soDung === 3 || soDung === 4) {
+            heSo = 2;
+        }
+
+        const nhanDuoc = cuoc * heSo;
+
+        user.coin += nhanDuoc;
+
+        if (!Array.isArray(data.lichsu_color_dice)) {
+            data.lichsu_color_dice = [];
+        }
+
+        data.lichsu_color_dice.push({
+            id: data.lichsu_color_dice.length + 1,
+            user_id: user.id,
+            email: user.email,
+            mau_chon: color,
+            ket_qua: ketQua,
+            so_mau_dung: soDung,
+            tien_cuoc: cuoc,
+            he_so: heSo,
+            coin_nhan: nhanDuoc,
+            coin_con_lai: user.coin,
+            thoi_gian: new Date().toISOString()
+        });
+
+        saveDB();
+
+        return res.json({
+            thanh_cong: true,
+            mau_chon: color,
+            ket_qua: ketQua,
+            so_mau_dung: soDung,
+            tien_cuoc: cuoc,
+            he_so: heSo,
+            coin_nhan: nhanDuoc,
+            coin: user.coin
+        });
+
+    } catch (error) {
+        console.error('Lỗi Color Dice:', error);
+
+        return res.status(500).json({
+            thanh_cong: false,
+            thong_bao: 'Lỗi máy chủ'
+        });
+    }
+});
 
 /* =========================================================
    XỬ LÝ LỖI

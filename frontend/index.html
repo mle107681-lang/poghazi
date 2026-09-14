@@ -758,7 +758,139 @@ td{
     }
 
 }
-</style>
+
+/* ================================
+   COLOR DICE
+================================ */
+
+.color-dice-box{
+    background:
+        radial-gradient(circle at 50% 0%,rgba(124,92,255,.16),transparent 45%),
+        #0d0f16;
+    border:1px solid var(--border);
+    border-radius:18px;
+    padding:20px;
+}
+
+.dice-coins{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:12px;
+    background:#11141c;
+    border:1px solid var(--border);
+    border-radius:12px;
+    padding:14px;
+    margin-bottom:18px;
+}
+
+.dice-coins-label{
+    color:var(--muted);
+    font-size:12px;
+}
+
+.dice-coins-value{
+    font-size:20px;
+    font-weight:bold;
+    color:#fbbf24;
+}
+
+.color-choice{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:10px;
+    margin:15px 0;
+}
+
+.color-btn{
+    border:2px solid transparent;
+    border-radius:12px;
+    padding:13px 8px;
+    color:white;
+    background:#171a24;
+    transition:.2s;
+}
+
+.color-btn:hover{
+    transform:translateY(-2px);
+}
+
+.color-btn.selected{
+    border-color:white;
+    box-shadow:0 0 18px rgba(255,255,255,.18);
+}
+
+.color-dot{
+    width:22px;
+    height:22px;
+    border-radius:50%;
+    margin:0 auto 7px;
+}
+
+.dot-do{background:#ef4444;}
+.dot-xanh-la{background:#22c55e;}
+.dot-xanh-duong{background:#3b82f6;}
+.dot-vang{background:#facc15;}
+.dot-tim{background:#a855f7;}
+.dot-cam{background:#f97316;}
+
+.dice-result{
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    gap:10px;
+    margin:20px 0;
+}
+
+.dice{
+    aspect-ratio:1;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    border-radius:14px;
+    background:#171a24;
+    border:1px solid var(--border);
+    font-size:34px;
+    font-weight:bold;
+    transition:.25s;
+}
+
+.dice.roll{
+    animation:diceRoll .45s ease;
+}
+
+@keyframes diceRoll{
+    0%{transform:rotate(0) scale(.8);opacity:.4}
+    50%{transform:rotate(180deg) scale(1.1);opacity:1}
+    100%{transform:rotate(360deg) scale(1);opacity:1}
+}
+
+.dice-message{
+    text-align:center;
+    color:var(--muted);
+    min-height:24px;
+    margin:10px 0 15px;
+}
+
+.dice-win{
+    color:#4ade80;
+    font-weight:bold;
+}
+
+.dice-lose{
+    color:#f87171;
+    font-weight:bold;
+}
+
+@media(max-width:600px){
+    .color-choice{
+        grid-template-columns:repeat(2,1fr);
+    }
+
+    .dice{
+        font-size:25px;
+    }
+}
+\n</style>
 </head>
 
 <body>
@@ -999,6 +1131,18 @@ td{
     >
         ⚙️ Quản trị Admin
     </button>
+
+    <div class="nav-title">
+        GAME
+    </div>
+
+    <button
+        class="nav-item"
+        onclick="showPage('color-dice',this)"
+    >
+        🎲 Color Dice
+    </button>
+
 
     <div class="nav-title">
         Khác
@@ -1467,6 +1611,181 @@ td{
                     <tbody id="depositTable"></tbody>
 
                 </table>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+
+    <!-- COLOR DICE -->
+
+    <section
+        id="page-color-dice"
+        class="page"
+    >
+
+        <div class="card">
+
+            <h2 class="section-title">
+                🎲 Color Dice
+            </h2>
+
+            <p style="
+                color:var(--muted);
+                margin-bottom:18px;
+                line-height:1.6;
+            ">
+                Chọn 1 màu và cược Coin.
+                Mỗi lượt sẽ quay 4 xúc xắc.
+            </p>
+
+            <div class="color-dice-box">
+
+                <div class="dice-coins">
+
+                    <div>
+                        <div class="dice-coins-label">
+                            Coin hiện tại
+                        </div>
+
+                        <div
+                            id="diceCoin"
+                            class="dice-coins-value"
+                        >
+                            0 Coin
+                        </div>
+                    </div>
+
+                    <div style="text-align:right;">
+                        <div class="dice-coins-label">
+                            Màu đã chọn
+                        </div>
+
+                        <strong id="diceSelectedColor">
+                            Chưa chọn
+                        </strong>
+                    </div>
+
+                </div>
+
+
+                <div
+                    id="colorChoice"
+                    class="color-choice"
+                >
+
+                    <button
+                        type="button"
+                        class="color-btn"
+                        data-color="do"
+                        onclick="selectDiceColor('do')"
+                    >
+                        <div class="color-dot dot-do"></div>
+                        🔴 Đỏ
+                    </button>
+
+                    <button
+                        type="button"
+                        class="color-btn"
+                        data-color="xanh_la"
+                        onclick="selectDiceColor('xanh_la')"
+                    >
+                        <div class="color-dot dot-xanh-la"></div>
+                        🟢 Xanh lá
+                    </button>
+
+                    <button
+                        type="button"
+                        class="color-btn"
+                        data-color="xanh_duong"
+                        onclick="selectDiceColor('xanh_duong')"
+                    >
+                        <div class="color-dot dot-xanh-duong"></div>
+                        🔵 Xanh dương
+                    </button>
+
+                    <button
+                        type="button"
+                        class="color-btn"
+                        data-color="vang"
+                        onclick="selectDiceColor('vang')"
+                    >
+                        <div class="color-dot dot-vang"></div>
+                        🟡 Vàng
+                    </button>
+
+                    <button
+                        type="button"
+                        class="color-btn"
+                        data-color="tim"
+                        onclick="selectDiceColor('tim')"
+                    >
+                        <div class="color-dot dot-tim"></div>
+                        🟣 Tím
+                    </button>
+
+                    <button
+                        type="button"
+                        class="color-btn"
+                        data-color="cam"
+                        onclick="selectDiceColor('cam')"
+                    >
+                        <div class="color-dot dot-cam"></div>
+                        🟠 Cam
+                    </button>
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label>
+                        Số Coin cược
+                    </label>
+
+                    <input
+                        id="diceBet"
+                        class="input"
+                        type="number"
+                        min="1"
+                        step="1"
+                        value="10"
+                        placeholder="Nhập số Coin"
+                    >
+
+                </div>
+
+
+                <div class="dice-result">
+
+                    <div id="dice1" class="dice">?</div>
+                    <div id="dice2" class="dice">?</div>
+                    <div id="dice3" class="dice">?</div>
+                    <div id="dice4" class="dice">?</div>
+
+                </div>
+
+
+                <div
+                    id="diceMessage"
+                    class="dice-message"
+                >
+                    Chọn màu rồi bấm CHƠI.
+                </div>
+
+
+                <button
+                    id="dicePlayButton"
+                    type="button"
+                    class="btn btn-primary"
+                    style="width:100%;font-size:16px;"
+                    onclick="playColorDice()"
+                >
+                    🎲 CHƠI
+                </button>
 
             </div>
 
@@ -4816,7 +5135,269 @@ function escapeHtml(value){
         .replace(/'/g,"&#039;");
 }
 
-</script>
+
+
+/* =========================================================
+   COLOR DICE FRONTEND
+   ========================================================= */
+
+let diceSelectedColor = null;
+
+const DICE_COLOR_NAMES = {
+    do: "🔴 Đỏ",
+    xanh_la: "🟢 Xanh lá",
+    xanh_duong: "🔵 Xanh dương",
+    vang: "🟡 Vàng",
+    tim: "🟣 Tím",
+    cam: "🟠 Cam"
+};
+
+const DICE_COLOR_EMOJI = {
+    do: "🔴",
+    xanh_la: "🟢",
+    xanh_duong: "🔵",
+    vang: "🟡",
+    tim: "🟣",
+    cam: "🟠"
+};
+
+function selectDiceColor(color){
+
+    diceSelectedColor = color;
+
+    document
+        .querySelectorAll(".color-btn")
+        .forEach(button => {
+
+            button.classList.toggle(
+                "selected",
+                button.dataset.color === color
+            );
+
+        });
+
+    const label =
+        document.getElementById(
+            "diceSelectedColor"
+        );
+
+    if(label){
+        label.textContent =
+            DICE_COLOR_NAMES[color] || color;
+    }
+}
+
+
+function updateDiceCoin(value){
+
+    const element =
+        document.getElementById("diceCoin");
+
+    if(element){
+        element.textContent =
+            formatNumber(value) + " Coin";
+    }
+}
+
+
+function updateDiceCoinFromAccount(){
+
+    if(!account){
+        return;
+    }
+
+    const coin =
+        Number(account.coin ?? 0);
+
+    updateDiceCoin(coin);
+}
+
+
+function diceColorText(color){
+
+    return DICE_COLOR_EMOJI[color] || "🎲";
+}
+
+
+function showDiceResult(result){
+
+    const diceElements = [
+        document.getElementById("dice1"),
+        document.getElementById("dice2"),
+        document.getElementById("dice3"),
+        document.getElementById("dice4")
+    ];
+
+    const results =
+        Array.isArray(result)
+            ? result
+            : [];
+
+    diceElements.forEach((element,index)=>{
+
+        if(!element) return;
+
+        element.classList.remove("roll");
+
+        void element.offsetWidth;
+
+        element.classList.add("roll");
+
+        element.textContent =
+            diceColorText(
+                results[index]
+            );
+
+    });
+}
+
+
+async function playColorDice(){
+
+    if(!token){
+
+        showToast(
+            "Vui lòng đăng nhập trước.",
+            "error"
+        );
+
+        return;
+    }
+
+    if(!diceSelectedColor){
+
+        showToast(
+            "Hãy chọn một màu.",
+            "error"
+        );
+
+        return;
+    }
+
+    const bet =
+        Number(
+            document
+                .getElementById("diceBet")
+                .value
+        );
+
+    if(!Number.isInteger(bet) || bet <= 0){
+
+        showToast(
+            "Số Coin cược không hợp lệ.",
+            "error"
+        );
+
+        return;
+    }
+
+    const button =
+        document.getElementById(
+            "dicePlayButton"
+        );
+
+    const message =
+        document.getElementById(
+            "diceMessage"
+        );
+
+    button.disabled = true;
+    button.textContent = "🎲 Đang quay...";
+
+    message.className = "dice-message";
+    message.textContent = "Đang quay 4 xúc xắc...";
+
+    try{
+
+        const data =
+            await api(
+                "/api/color-dice/roll",
+                {
+                    method:"POST",
+                    body:JSON.stringify({
+                        color:diceSelectedColor,
+                        bet
+                    })
+                }
+            );
+
+        showDiceResult(
+            data.ket_qua || []
+        );
+
+        updateDiceCoin(
+            data.coin ?? 0
+        );
+
+        if(account){
+            account.coin =
+                Number(data.coin ?? 0);
+        }
+
+        const correct =
+            Number(data.so_mau_dung ?? 0);
+
+        const received =
+            Number(data.coin_nhan ?? 0);
+
+        const multiplier =
+            Number(data.he_so ?? 0);
+
+        if(multiplier > 0){
+
+            message.className =
+                "dice-message dice-win";
+
+            message.textContent =
+                "🎉 Đúng " +
+                correct +
+                "/4 màu — nhận " +
+                formatNumber(received) +
+                " Coin (" +
+                multiplier +
+                "x)";
+
+        }else{
+
+            message.className =
+                "dice-message dice-lose";
+
+            message.textContent =
+                "💥 Không trúng màu — mất " +
+                formatNumber(bet) +
+                " Coin";
+
+        }
+
+        showToast(
+            "Đã quay Color Dice!",
+            "success"
+        );
+
+    }catch(error){
+
+        message.className =
+            "dice-message dice-lose";
+
+        message.textContent =
+            error.message ||
+            "Không thể chơi Color Dice.";
+
+        showToast(
+            error.message ||
+            "Không thể chơi Color Dice.",
+            "error"
+        );
+
+    }finally{
+
+        button.disabled = false;
+        button.textContent = "🎲 CHƠI";
+
+    }
+}
+
+\n</script>
 
 </body>
 </html>
