@@ -894,6 +894,8 @@ td{
 </head>
 
 <body>
+<div id="thong-tin-nguoi-dung" style="position:fixed;top:10px;right:10px;z-index:9999;"></div>
+<div id="thong-tin-nguoi-dung" style="position:fixed;top:10px;right:10px;z-index:9999;"></div>
 
 <!-- AUTH -->
 
@@ -4198,7 +4200,7 @@ document
    START
 ================================ */
 
-startApp();
+if(token) startApp(token);
 
 
 
@@ -5397,7 +5399,9 @@ async function playColorDice(){
     }
 }
 
-\n</script>
+startApp();
+
+</script>
 
 </body>
 </html>
