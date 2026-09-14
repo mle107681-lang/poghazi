@@ -1797,6 +1797,18 @@ td{
 
 
 
+    
+        <!-- COLOR DICE HISTORY -->
+        <div class="card" style="margin-top:20px;">
+            <h3 class="section-title">📜 Lịch sử Color Dice</h3>
+
+            <div id="diceHistoryList">
+                <div style="color:var(--muted);text-align:center;padding:15px;">
+                    Đang tải lịch sử...
+                </div>
+            </div>
+        </div>
+
     <!-- ADMIN DASHBOARD -->
 
     <section
@@ -2325,6 +2337,8 @@ document
         try{
 
             await startApp();
+
+loadColorDiceHistory();
 
 
             showToast(
@@ -5371,6 +5385,8 @@ async function playColorDice(){
 
         }
 
+        await loadColorDiceHistory();
+
         showToast(
             "Đã quay Color Dice!",
             "success"
@@ -5396,6 +5412,30 @@ async function playColorDice(){
         button.disabled = false;
         button.textContent = "🎲 CHƠI";
 
+    }
+}
+
+async function loadColorDiceHistory() {
+    const box = document.getElementById("diceHistoryList");
+    if (!box || !token) return;
+    try {
+        const data = await api("/api/color-dice/history");
+        const history = Array.isArray(data.lich_su) ? data.lich_su : [];
+        if (!history.length) {
+            box.innerHTML = "<div style=\"color:var(--muted);text-align:center;padding:15px;\">Chưa có lịch sử Color Dice.</div>";
+            return;
+        }
+        const names = { do:"🔴 Đỏ", xanh_la:"🟢 Xanh lá", xanh_duong:"🔵 Xanh dương", vang:"🟡 Vàng", tim:"🟣 Tím", cam:"🟠 Cam" };
+        box.innerHTML = history.map(x => {
+            const kq = (x.ket_qua || []).map(c => names[c] || c).join(" · ");
+            const time = x.thoi_gian ? new Date(x.thoi_gian).toLocaleString("vi-VN") : "";
+            return "<div style=\"padding:12px;margin-bottom:8px;border:1px solid rgba(255,255,255,.08);border-radius:12px;background:rgba(255,255,255,.03);\">" +
+                "<strong>" + (names[x.mau_chon] || x.mau_chon) + "</strong> <small style=\"color:var(--muted)\">" + time + "</small>" +
+                "<div style=\"margin-top:6px;font-size:13px;line-height:1.7\">🎲 Kết quả: " + kq + "<br>🎯 Đúng: " + Number(x.so_mau_dung || 0) + "/4<br>💰 Cược: " + formatNumber(Number(x.tien_cuoc || 0)) + " Coin<br>📈 Hệ số: " + Number(x.he_so || 0) + "x<br>🪙 Nhận: " + formatNumber(Number(x.coin_nhan || 0)) + " Coin<br>💳 Còn lại: " + formatNumber(Number(x.coin_con_lai || 0)) + " Coin</div></div>";
+        }).join("");
+    } catch (e) {
+        console.error("Lỗi lịch sử Color Dice:", e);
+        box.innerHTML = "<div style=\"color:#f87171;text-align:center;padding:15px\">Không thể tải lịch sử.</div>";
     }
 }
 
