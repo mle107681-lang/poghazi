@@ -2498,6 +2498,7 @@ app.use(
 
 async function startServer() {
 
+    await db.ready;
     await ensureAdmin();
 
     app.listen(
