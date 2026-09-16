@@ -1145,6 +1145,14 @@ td{
         🎲 Color Dice
     </button>
 
+    
+    <button
+        class="nav-item"
+        onclick="showPage('xo-so',this)"
+    >
+        🎟️ Xổ Số
+    </button>
+
 
     <div class="nav-title">
         Khác
@@ -1614,6 +1622,235 @@ td{
 
                 </table>
 
+            </div>
+
+        </div>
+
+    </section>
+
+
+
+    
+    <!-- XO SO -->
+
+    <section
+        id="page-xo-so"
+        class="page"
+    >
+
+        <div class="card">
+
+            <h2 class="section-title">
+                🎟️ Xổ Số 00–99
+            </h2>
+
+            <p style="
+                color:var(--muted);
+                line-height:1.6;
+                margin-bottom:18px;
+            ">
+                Chọn 1 số từ 00 đến 99 và cược bằng Coin.
+                Số cược được dò trên cả 3 đài.
+            </p>
+
+            <div class="xoso-box">
+
+                <div class="xoso-top">
+
+                    <div class="xoso-info">
+
+                        <div class="xoso-label">
+                            Kỳ hiện tại
+                        </div>
+
+                        <div
+                            id="xosoRound"
+                            class="xoso-value"
+                        >
+                            -
+                        </div>
+
+                    </div>
+
+                    <div class="xoso-info">
+
+                        <div class="xoso-label">
+                            Trạng thái
+                        </div>
+
+                        <div
+                            id="xosoPhase"
+                            class="xoso-value"
+                        >
+                            Đang tải...
+                        </div>
+
+                    </div>
+
+                    <div class="xoso-info">
+
+                        <div class="xoso-label">
+                            Thời gian
+                        </div>
+
+                        <div
+                            id="xosoCountdown"
+                            class="xoso-value"
+                        >
+                            --
+                        </div>
+
+                    </div>
+
+                    <div class="xoso-info">
+
+                        <div class="xoso-label">
+                            Coin
+                        </div>
+
+                        <div
+                            id="xosoCoin"
+                            class="xoso-value"
+                            style="color:#fbbf24;"
+                        >
+                            0 Coin
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <div
+                    class="xoso-number-grid"
+                    id="xosoNumberGrid"
+                ></div>
+
+
+                <div class="form-group">
+
+                    <label>
+                        Số đã chọn
+                    </label>
+
+                    <input
+                        id="xosoNumber"
+                        class="input"
+                        type="text"
+                        inputmode="numeric"
+                        maxlength="2"
+                        placeholder="00 - 99"
+                    >
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label>
+                        Số Coin cược
+                    </label>
+
+                    <input
+                        id="xosoBet"
+                        class="input"
+                        type="number"
+                        min="1"
+                        step="1"
+                        value="10"
+                        placeholder="Nhập số Coin"
+                    >
+
+                </div>
+
+
+                <div
+                    id="xosoMessage"
+                    class="xoso-message"
+                >
+                    Chọn số rồi đặt cược.
+                </div>
+
+
+                <button
+                    id="xosoBetButton"
+                    type="button"
+                    class="btn btn-primary"
+                    style="width:100%;font-size:16px;"
+                    onclick="datCuocXoSo()"
+                >
+                    🎟️ ĐẶT CƯỢC
+                </button>
+
+            </div>
+
+        </div>
+
+
+        <div class="card">
+
+            <h3 class="section-title">
+                🎰 Kết quả 3 đài
+            </h3>
+
+            <div class="xoso-stations">
+
+                <div class="xoso-station">
+
+                    <h3>
+                        🏆 Tối yêu Việt Nam 1
+                    </h3>
+
+                    <div
+                        id="xosoStation1"
+                        class="xoso-results"
+                    ></div>
+
+                </div>
+
+
+                <div class="xoso-station">
+
+                    <h3>
+                        🏆 Tối yêu Việt Nam 2
+                    </h3>
+
+                    <div
+                        id="xosoStation2"
+                        class="xoso-results"
+                    ></div>
+
+                </div>
+
+
+                <div class="xoso-station">
+
+                    <h3>
+                        🏆 Tối yêu Việt Nam 3
+                    </h3>
+
+                    <div
+                        id="xosoStation3"
+                        class="xoso-results"
+                    ></div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div class="card">
+
+            <h3 class="section-title">
+                📜 Lịch sử Xổ Số
+            </h3>
+
+            <div
+                id="xosoHistory"
+            >
+                Đang tải...
             </div>
 
         </div>
@@ -5291,6 +5528,661 @@ function escapeHtml(value){
         .replace(/'/g,"&#039;");
 }
 
+
+
+
+/* =========================================================
+   XO SO FRONTEND
+   ========================================================= */
+
+let xosoSelectedNumber = null;
+let xosoLastRound = null;
+let xosoTimer = null;
+
+function renderXoSoNumbers(){
+
+    const box =
+        document.getElementById(
+            "xosoNumberGrid"
+        );
+
+    if(!box) return;
+
+    let html = "";
+
+    for(let i = 0; i <= 99; i++){
+
+        const so =
+            String(i).padStart(2,"0");
+
+        html += `
+            <button
+                type="button"
+                class="xoso-number ${
+                    xosoSelectedNumber === so
+                        ? "selected"
+                        : ""
+                }"
+                onclick="selectXoSoNumber('${so}')"
+            >
+                ${so}
+            </button>
+        `;
+    }
+
+    box.innerHTML = html;
+}
+
+function selectXoSoNumber(so){
+
+    xosoSelectedNumber =
+        String(so).padStart(2,"0");
+
+    const input =
+        document.getElementById(
+            "xosoNumber"
+        );
+
+    if(input){
+        input.value =
+            xosoSelectedNumber;
+    }
+
+    renderXoSoNumbers();
+}
+
+function formatCountdown(ms){
+
+    const total =
+        Math.max(
+            0,
+            Math.ceil(ms / 1000)
+        );
+
+    const phut =
+        Math.floor(total / 60);
+
+    const giay =
+        total % 60;
+
+    return (
+        String(phut).padStart(2,"0") +
+        ":" +
+        String(giay).padStart(2,"0")
+    );
+}
+
+function renderXoSoStation(
+    elementId,
+    results
+){
+
+    const box =
+        document.getElementById(
+            elementId
+        );
+
+    if(!box) return;
+
+    const list =
+        Array.isArray(results)
+            ? results
+            : [];
+
+    box.innerHTML =
+        list.map((so,index)=>{
+
+            const visible =
+                so !== null &&
+                so !== undefined;
+
+            return `
+                <div class="
+                    xoso-result
+                    ${
+                        visible
+                            ? "revealed"
+                            : "hidden-result"
+                    }
+                ">
+                    ${
+                        visible
+                            ? escapeHtml(so)
+                            : "??"
+                    }
+                </div>
+            `;
+
+        }).join("");
+}
+
+function renderXoSoBet(bet){
+
+    const message =
+        document.getElementById(
+            "xosoMessage"
+        );
+
+    const button =
+        document.getElementById(
+            "xosoBetButton"
+        );
+
+    if(!bet){
+
+        if(button){
+            button.disabled = false;
+        }
+
+        return;
+    }
+
+    if(button){
+        button.disabled = true;
+        button.textContent =
+            "🎟️ ĐÃ ĐẶT KỲ NÀY";
+    }
+
+    if(message){
+
+        if(bet.da_thanh_toan){
+
+            const lan =
+                Number(
+                    bet.so_lan_trung || 0
+                );
+
+            const nhan =
+                Number(
+                    bet.coin_nhan || 0
+                );
+
+            const heSo =
+                Number(
+                    bet.he_so || 0
+                );
+
+            if(lan === 0){
+
+                message.className =
+                    "xoso-message xoso-lose";
+
+                message.textContent =
+                    `💥 Số ${bet.so} không xuất hiện — mất ${formatNumber(bet.tien_cuoc)} Coin`;
+
+            }else{
+
+                message.className =
+                    "xoso-message xoso-win";
+
+                message.textContent =
+                    `🎉 Số ${bet.so} xuất hiện ${lan} lần — nhận ${formatNumber(nhan)} Coin (${heSo}x)`;
+
+            }
+
+        }else{
+
+            message.className =
+                "xoso-message";
+
+            message.textContent =
+                `🎟️ Đã cược ${formatNumber(bet.tien_cuoc)} Coin vào số ${bet.so}. Chờ xổ kết quả.`;
+        }
+    }
+}
+
+async function loadXoSo(){
+
+    if(!token) return;
+
+    try{
+
+        const data =
+            await api(
+                "/api/xo-so/trang-thai"
+            );
+
+        const round =
+            document.getElementById(
+                "xosoRound"
+            );
+
+        const phase =
+            document.getElementById(
+                "xosoPhase"
+            );
+
+        const countdown =
+            document.getElementById(
+                "xosoCountdown"
+            );
+
+        const coin =
+            document.getElementById(
+                "xosoCoin"
+            );
+
+        if(round){
+            round.textContent =
+                data.ky_id || "-";
+        }
+
+        if(phase){
+            phase.textContent =
+                data.phase_text || "-";
+        }
+
+        if(countdown){
+            countdown.textContent =
+                formatCountdown(
+                    Number(
+                        data.thoi_gian_con_lai_ms || 0
+                    )
+                );
+        }
+
+        if(coin){
+            coin.textContent =
+                formatNumber(
+                    Number(data.coin || 0)
+                ) + " Coin";
+        }
+
+        const result =
+            data.ket_qua || {};
+
+        renderXoSoStation(
+            "xosoStation1",
+            result.toiyeuVietNam1
+        );
+
+        renderXoSoStation(
+            "xosoStation2",
+            result.toiyeuVietNam2
+        );
+
+        renderXoSoStation(
+            "xosoStation3",
+            result.toiyeuVietNam3
+        );
+
+        renderXoSoBet(
+            data.cuoc_cua_toi
+        );
+
+        if(
+            xosoLastRound &&
+            xosoLastRound !== data.ky_id
+        ){
+
+            xosoSelectedNumber = null;
+
+            const input =
+                document.getElementById(
+                    "xosoNumber"
+                );
+
+            if(input){
+                input.value = "";
+            }
+
+            renderXoSoNumbers();
+
+        }
+
+        xosoLastRound =
+            data.ky_id;
+
+    }catch(error){
+
+        console.error(
+            "Lỗi Xổ Số:",
+            error
+        );
+    }
+}
+
+async function datCuocXoSo(){
+
+    if(!token){
+
+        showToast(
+            "Vui lòng đăng nhập trước.",
+            "error"
+        );
+
+        return;
+    }
+
+    let so =
+        String(
+            document
+                .getElementById("xosoNumber")
+                .value
+                .trim()
+        );
+
+    if(!/^\d{1,2}$/.test(so)){
+
+        showToast(
+            "Hãy chọn số từ 00 đến 99.",
+            "error"
+        );
+
+        return;
+    }
+
+    so =
+        so.padStart(2,"0");
+
+    const coin =
+        Number(
+            document
+                .getElementById("xosoBet")
+                .value
+        );
+
+    if(
+        !Number.isInteger(coin) ||
+        coin <= 0
+    ){
+
+        showToast(
+            "Số Coin cược không hợp lệ.",
+            "error"
+        );
+
+        return;
+    }
+
+    const button =
+        document.getElementById(
+            "xosoBetButton"
+        );
+
+    const message =
+        document.getElementById(
+            "xosoMessage"
+        );
+
+    button.disabled = true;
+    button.textContent =
+        "🎟️ Đang đặt...";
+
+    try{
+
+        const data =
+            await api(
+                "/api/xo-so/dat-cuoc",
+                {
+                    method:"POST",
+
+                    body:JSON.stringify({
+                        so,
+                        coin
+                    })
+                }
+            );
+
+        xosoSelectedNumber =
+            so;
+
+        if(account){
+            account.coin =
+                Number(data.coin || 0);
+        }
+
+        if(message){
+
+            message.className =
+                "xoso-message";
+
+            message.textContent =
+                `🎟️ ${data.thong_bao || "Đặt cược thành công."}`;
+        }
+
+        showToast(
+            data.thong_bao ||
+            "Đặt cược Xổ Số thành công!",
+            "success"
+        );
+
+        await loadXoSo();
+        await loadXoSoHistory();
+        await loadAccount();
+
+    }catch(error){
+
+        button.disabled = false;
+        button.textContent =
+            "🎟️ ĐẶT CƯỢC";
+
+        if(message){
+
+            message.className =
+                "xoso-message xoso-lose";
+
+            message.textContent =
+                error.message ||
+                "Không thể đặt cược.";
+        }
+
+        showToast(
+            error.message ||
+            "Không thể đặt cược.",
+            "error"
+        );
+    }
+}
+
+async function loadXoSoHistory(){
+
+    const box =
+        document.getElementById(
+            "xosoHistory"
+        );
+
+    if(!box || !token) return;
+
+    try{
+
+        const data =
+            await api(
+                "/api/xo-so/lich-su"
+            );
+
+        const history =
+            Array.isArray(data.lich_su)
+                ? data.lich_su
+                : [];
+
+        if(!history.length){
+
+            box.innerHTML =
+                `<div class="empty">
+                    Chưa có lịch sử Xổ Số.
+                </div>`;
+
+            return;
+        }
+
+        box.innerHTML =
+            history.map(x => {
+
+                let status =
+                    "⏳ Chờ kết quả";
+
+                if(x.da_thanh_toan){
+
+                    const lan =
+                        Number(
+                            x.so_lan_trung || 0
+                        );
+
+                    if(lan === 0){
+                        status =
+                            "❌ Thua";
+                    }else if(lan === 1){
+                        status =
+                            "🤝 Hòa vốn";
+                    }else{
+                        status =
+                            "🎉 Thắng";
+                    }
+                }
+
+                return `
+                    <div style="
+                        padding:12px;
+                        margin-bottom:8px;
+                        border:1px solid rgba(255,255,255,.08);
+                        border-radius:12px;
+                        background:rgba(255,255,255,.03);
+                    ">
+
+                        <strong>
+                            🎟️ Số ${escapeHtml(x.so)}
+                        </strong>
+
+                        <small style="
+                            color:var(--muted);
+                            margin-left:8px;
+                        ">
+                            ${dateFormat(x.ngay_dat)}
+                        </small>
+
+                        <div style="
+                            margin-top:7px;
+                            font-size:13px;
+                            line-height:1.7;
+                        ">
+
+                            💰 Cược:
+                            ${formatNumber(Number(x.tien_cuoc || 0))}
+                            Coin
+
+                            <br>
+
+                            📊 Kết quả:
+                            ${
+                                x.da_thanh_toan
+                                    ? Number(x.so_lan_trung || 0) + " lần"
+                                    : "Đang chờ"
+                            }
+
+                            <br>
+
+                            📈 Hệ số:
+                            ${
+                                x.da_thanh_toan
+                                    ? Number(x.he_so || 0) + "x"
+                                    : "-"
+                            }
+
+                            <br>
+
+                            🪙 Nhận:
+                            ${formatNumber(Number(x.coin_nhan || 0))}
+                            Coin
+
+                            <br>
+
+                            ${status}
+
+                        </div>
+
+                    </div>
+                `;
+
+            }).join("");
+
+    }catch(error){
+
+        console.error(
+            "Lỗi lịch sử Xổ Số:",
+            error
+        );
+
+        box.innerHTML =
+            `<div style="
+                color:#f87171;
+                text-align:center;
+                padding:15px;
+            ">
+                Không thể tải lịch sử Xổ Số.
+            </div>`;
+    }
+}
+
+function startXoSoFrontend(){
+
+    renderXoSoNumbers();
+
+    loadXoSo();
+    loadXoSoHistory();
+
+    if(xosoTimer){
+        clearInterval(xosoTimer);
+    }
+
+    xosoTimer =
+        setInterval(() => {
+
+            const page =
+                document.getElementById(
+                    "page-xo-so"
+                );
+
+            if(
+                page &&
+                page.classList.contains("active")
+            ){
+
+                loadXoSo();
+                loadXoSoHistory();
+
+            }
+
+        },1000);
+}
+
+const xosoInput =
+    document.getElementById(
+        "xosoNumber"
+    );
+
+if(xosoInput){
+
+    xosoInput.addEventListener(
+        "input",
+        () => {
+
+            let value =
+                xosoInput.value
+                    .replace(/\D/g,"")
+                    .slice(0,2);
+
+            xosoInput.value =
+                value;
+
+            if(
+                value.length === 1
+            ){
+                xosoSelectedNumber =
+                    value.padStart(2,"0");
+            }else if(
+                value.length === 2
+            ){
+                xosoSelectedNumber =
+                    value;
+            }
+
+            renderXoSoNumbers();
+        }
+    );
+}
+
+startXoSoFrontend();
 
 
 /* =========================================================

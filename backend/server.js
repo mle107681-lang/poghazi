@@ -2,6 +2,7 @@ const express = require('express');
 const cors = require('cors');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+const crypto = require('crypto');
 const db = require('./database');
 
 const app = express();
@@ -2477,6 +2478,741 @@ app.get('/api/color-dice/history', auth, (req, res) => {
 });
 
 
+
+// ================================
+// POGHAZI XO SO 00-99
+// ================================
+
+const XO_SO_CHU_KY = 20 * 60 * 1000;
+const XO_SO_MO_CUOC = 5 * 60 * 1000;
+const XO_SO_XO = 10 * 60 * 1000;
+const XO_SO_KIEM_TRA = 15 * 60 * 1000;
+
+const XO_SO_TRAM = [
+    'toiyeuVietNam1',
+    'toiyeuVietNam2',
+    'toiyeuVietNam3'
+];
+
+function xoSoRoundStart(ms = Date.now()) {
+    return Math.floor(ms / XO_SO_CHU_KY) * XO_SO_CHU_KY;
+}
+
+function tao18SoXoSo() {
+
+    const ketQua = [];
+
+    for (let i = 0; i < 18; i++) {
+
+        const so =
+            crypto.randomInt(0, 100)
+                .toString()
+                .padStart(2, '0');
+
+        ketQua.push(so);
+    }
+
+    return ketQua;
+}
+
+function taoKyXoSo(roundStart) {
+
+    return {
+        id: "XS" + roundStart,
+
+        bat_dau:
+            new Date(roundStart).toISOString(),
+
+        ket_thuc:
+            new Date(
+                roundStart + XO_SO_CHU_KY
+            ).toISOString(),
+
+        ket_qua: {
+            toiyeuVietNam1: tao18SoXoSo(),
+            toiyeuVietNam2: tao18SoXoSo(),
+            toiyeuVietNam3: tao18SoXoSo()
+        },
+
+        ngay_tao:
+            new Date().toISOString()
+    };
+}
+
+function ensureLotteryRound() {
+
+    const data = getDB();
+
+    if (!Array.isArray(data.xo_so_ky)) {
+        data.xo_so_ky = [];
+    }
+
+    if (!Array.isArray(data.xo_so_cuoc)) {
+        data.xo_so_cuoc = [];
+    }
+
+    const start = xoSoRoundStart();
+
+    let ky =
+        data.xo_so_ky.find(
+            x =>
+                Number(
+                    new Date(x.bat_dau).getTime()
+                ) === start
+        );
+
+    if (!ky) {
+
+        ky = taoKyXoSo(start);
+
+        data.xo_so_ky.push(ky);
+
+        // Chỉ giữ 100 kỳ gần nhất
+        if (data.xo_so_ky.length > 100) {
+            data.xo_so_ky =
+                data.xo_so_ky.slice(-100);
+        }
+
+        saveDB();
+    }
+
+    return ky;
+}
+
+function xoSoPhase(ky) {
+
+    const start =
+        new Date(ky.bat_dau).getTime();
+
+    const elapsed =
+        Date.now() - start;
+
+    if (elapsed < XO_SO_MO_CUOC) {
+
+        return {
+            phase: "mo_cuoc",
+            text: "🟢 Đang mở cược",
+            so_da_mo: 0,
+            con_lai:
+                XO_SO_MO_CUOC - elapsed
+        };
+    }
+
+    if (elapsed < XO_SO_KIEM_TRA) {
+
+        const elapsedXo =
+            elapsed - XO_SO_MO_CUOC;
+
+        const moiSo =
+            XO_SO_XO / 18;
+
+        const soDaMo =
+            Math.min(
+                18,
+                Math.max(
+                    0,
+                    Math.floor(elapsedXo / moiSo) + 1
+                )
+            );
+
+        return {
+            phase: "dang_xo",
+            text: "🎰 Đang xổ",
+            so_da_mo: soDaMo,
+            con_lai:
+                XO_SO_KIEM_TRA - elapsed
+        };
+    }
+
+    return {
+        phase: "kiem_tra",
+        text: "📋 Kiểm tra kết quả",
+        so_da_mo: 18,
+        con_lai:
+            XO_SO_CHU_KY - elapsed
+    };
+}
+
+function ketQuaAnTheoPhase(ky, soDaMo) {
+
+    const result = {};
+
+    XO_SO_TRAM.forEach(tram => {
+
+        result[tram] =
+            ky.ket_qua[tram].map(
+                (so, index) =>
+                    index < soDaMo
+                        ? so
+                        : null
+            );
+    });
+
+    return result;
+}
+
+function demSoLanXuatHien(ky, so) {
+
+    let count = 0;
+
+    XO_SO_TRAM.forEach(tram => {
+
+        const list =
+            ky.ket_qua[tram] || [];
+
+        count +=
+            list.filter(
+                x => x === so
+            ).length;
+    });
+
+    return count;
+}
+
+function heSoXoSo(soLan) {
+
+    if (soLan <= 0) return 0;
+
+    if (soLan === 1) return 1;
+    if (soLan === 2) return 2;
+    if (soLan === 3) return 3;
+
+    return 4;
+}
+
+function settleLottery() {
+
+    const data = getDB();
+
+    if (!Array.isArray(data.xo_so_ky)) {
+        data.xo_so_ky = [];
+    }
+
+    if (!Array.isArray(data.xo_so_cuoc)) {
+        data.xo_so_cuoc = [];
+    }
+
+    let changed = false;
+
+    for (const bet of data.xo_so_cuoc) {
+
+        if (bet.da_thanh_toan) {
+            continue;
+        }
+
+        const ky =
+            data.xo_so_ky.find(
+                x => x.id === bet.ky_id
+            );
+
+        if (!ky) {
+            continue;
+        }
+
+        const start =
+            new Date(
+                ky.bat_dau
+            ).getTime();
+
+        if (
+            Date.now() <
+            start + XO_SO_KIEM_TRA
+        ) {
+            continue;
+        }
+
+        const user =
+            data.users.find(
+                u => u.id === bet.user_id
+            );
+
+        if (!user) {
+            bet.da_thanh_toan = true;
+            bet.trang_thai = "loi_tai_khoan";
+            changed = true;
+            continue;
+        }
+
+        if (typeof user.coin !== "number") {
+            user.coin = 1000;
+        }
+
+        const soLan =
+            demSoLanXuatHien(
+                ky,
+                bet.so
+            );
+
+        const heSo =
+            heSoXoSo(soLan);
+
+        const coinNhan =
+            Number(bet.tien_cuoc) * heSo;
+
+        user.coin += coinNhan;
+
+        bet.so_lan_trung = soLan;
+        bet.he_so = heSo;
+        bet.coin_nhan = coinNhan;
+        bet.coin_sau = user.coin;
+        bet.da_thanh_toan = true;
+
+        if (soLan === 0) {
+            bet.trang_thai = "thua";
+        } else if (soLan === 1) {
+            bet.trang_thai = "hoa_von";
+        } else {
+            bet.trang_thai = "thang";
+        }
+
+        bet.thoi_gian_thanh_toan =
+            new Date().toISOString();
+
+        if (!Array.isArray(data.lichsu_giao_dich)) {
+            data.lichsu_giao_dich = [];
+        }
+
+        data.lichsu_giao_dich.push({
+            id:
+                data.lichsu_giao_dich.length + 1,
+
+            user_id:
+                user.id,
+
+            loai:
+                "xo_so",
+
+            so_tien:
+                coinNhan,
+
+            noi_dung:
+                coinNhan > 0
+                    ? `Xổ số ${bet.so} - trúng ${soLan} lần - nhận ${coinNhan} Coin`
+                    : `Xổ số ${bet.so} - không trúng`,
+
+            ngay_tao:
+                new Date().toISOString()
+        });
+
+        changed = true;
+    }
+
+    if (changed) {
+        saveDB();
+    }
+}
+
+function khoiDongXoSo() {
+
+    ensureLotteryRound();
+    settleLottery();
+
+    setInterval(() => {
+
+        try {
+
+            ensureLotteryRound();
+            settleLottery();
+
+        } catch (error) {
+
+            console.error(
+                "Lỗi hệ thống Xổ Số:",
+                error
+            );
+        }
+
+    }, 5000);
+}
+
+
+// ================================
+// API XỔ SỐ - TRẠNG THÁI
+// ================================
+
+app.get(
+    '/api/xo-so/trang-thai',
+    auth,
+    (req, res) => {
+
+        try {
+
+            const ky =
+                ensureLotteryRound();
+
+            settleLottery();
+
+            const phase =
+                xoSoPhase(ky);
+
+            const data =
+                getDB();
+
+            const user =
+                data.users.find(
+                    u => u.id === req.user.id
+                );
+
+            const cuoc =
+                data.xo_so_cuoc
+                    .filter(
+                        x =>
+                            x.ky_id === ky.id &&
+                            x.user_id === req.user.id
+                    )
+                    .slice(-1)[0] || null;
+
+            return res.json({
+
+                thanh_cong: true,
+
+                ky_id:
+                    ky.id,
+
+                bat_dau:
+                    ky.bat_dau,
+
+                ket_thuc:
+                    ky.ket_thuc,
+
+                phase:
+                    phase.phase,
+
+                phase_text:
+                    phase.text,
+
+                thoi_gian_con_lai_ms:
+                    Math.max(
+                        0,
+                        phase.con_lai
+                    ),
+
+                so_da_mo:
+                    phase.so_da_mo,
+
+                ket_qua:
+                    ketQuaAnTheoPhase(
+                        ky,
+                        phase.so_da_mo
+                    ),
+
+                cuoc_cua_toi:
+                    cuoc,
+
+                coin:
+                    Number(
+                        user?.coin || 0
+                    )
+            });
+
+        } catch (error) {
+
+            console.error(
+                "Lỗi trạng thái Xổ Số:",
+                error
+            );
+
+            return res.status(500).json({
+                thanh_cong: false,
+                thong_bao: "Lỗi máy chủ"
+            });
+        }
+    }
+);
+
+
+// ================================
+// API XỔ SỐ - ĐẶT CƯỢC
+// ================================
+
+app.post(
+    '/api/xo-so/dat-cuoc',
+    auth,
+    (req, res) => {
+
+        try {
+
+            const so =
+                String(
+                    req.body.so ?? ""
+                )
+                .trim()
+                .padStart(2, "0");
+
+            const coin =
+                Number(
+                    req.body.coin
+                );
+
+            if (
+                !/^\d{2}$/.test(so) ||
+                Number(so) < 0 ||
+                Number(so) > 99
+            ) {
+
+                return res.status(400).json({
+                    thanh_cong: false,
+                    thong_bao:
+                        "Số cược phải từ 00 đến 99"
+                });
+            }
+
+            if (
+                !Number.isInteger(coin) ||
+                coin <= 0
+            ) {
+
+                return res.status(400).json({
+                    thanh_cong: false,
+                    thong_bao:
+                        "Số Coin cược không hợp lệ"
+                });
+            }
+
+            const ky =
+                ensureLotteryRound();
+
+            const phase =
+                xoSoPhase(ky);
+
+            if (
+                phase.phase !== "mo_cuoc"
+            ) {
+
+                return res.status(400).json({
+                    thanh_cong: false,
+                    thong_bao:
+                        "Đã hết thời gian đặt cược cho kỳ này"
+                });
+            }
+
+            const data =
+                getDB();
+
+            const user =
+                data.users.find(
+                    u => u.id === req.user.id
+                );
+
+            if (!user) {
+
+                return res.status(404).json({
+                    thanh_cong: false,
+                    thong_bao:
+                        "Không tìm thấy tài khoản"
+                });
+            }
+
+            if (typeof user.coin !== "number") {
+                user.coin = 1000;
+            }
+
+            if (user.coin < coin) {
+
+                return res.status(400).json({
+                    thanh_cong: false,
+                    thong_bao:
+                        "Không đủ Coin"
+                });
+            }
+
+            const daDat =
+                data.xo_so_cuoc.some(
+                    x =>
+                        x.ky_id === ky.id &&
+                        x.user_id === user.id
+                );
+
+            if (daDat) {
+
+                return res.status(400).json({
+                    thanh_cong: false,
+                    thong_bao:
+                        "Bạn đã đặt cược kỳ này rồi"
+                });
+            }
+
+            user.coin -= coin;
+
+            const bet = {
+
+                id:
+                    data.xo_so_cuoc.length + 1,
+
+                ky_id:
+                    ky.id,
+
+                user_id:
+                    user.id,
+
+                email:
+                    user.email,
+
+                so,
+
+                tien_cuoc:
+                    coin,
+
+                trang_thai:
+                    "dang_cho",
+
+                so_lan_trung:
+                    null,
+
+                he_so:
+                    null,
+
+                coin_nhan:
+                    0,
+
+                coin_sau_dat:
+                    user.coin,
+
+                da_thanh_toan:
+                    false,
+
+                ngay_dat:
+                    new Date().toISOString(),
+
+                thoi_gian_thanh_toan:
+                    null
+            };
+
+            data.xo_so_cuoc.push(bet);
+
+            if (!Array.isArray(data.lichsu_giao_dich)) {
+                data.lichsu_giao_dich = [];
+            }
+
+            data.lichsu_giao_dich.push({
+
+                id:
+                    data.lichsu_giao_dich.length + 1,
+
+                user_id:
+                    user.id,
+
+                loai:
+                    "cuoc_xo_so",
+
+                so_tien:
+                    -coin,
+
+                noi_dung:
+                    `Đặt Xổ Số số ${so}`,
+
+                ngay_tao:
+                    new Date().toISOString()
+            });
+
+            saveDB();
+
+            return res.json({
+
+                thanh_cong: true,
+
+                thong_bao:
+                    `Đã đặt ${coin} Coin vào số ${so}`,
+
+                so,
+
+                tien_cuoc:
+                    coin,
+
+                coin:
+                    user.coin,
+
+                ky_id:
+                    ky.id
+            });
+
+        } catch (error) {
+
+            console.error(
+                "Lỗi đặt Xổ Số:",
+                error
+            );
+
+            return res.status(500).json({
+                thanh_cong: false,
+                thong_bao:
+                    "Lỗi máy chủ"
+            });
+        }
+    }
+);
+
+
+// ================================
+// API XỔ SỐ - LỊCH SỬ
+// ================================
+
+app.get(
+    '/api/xo-so/lich-su',
+    auth,
+    (req, res) => {
+
+        try {
+
+            settleLottery();
+
+            const data =
+                getDB();
+
+            const history =
+                (data.xo_so_cuoc || [])
+                    .filter(
+                        x =>
+                            x.user_id === req.user.id
+                    )
+                    .slice(-30)
+                    .reverse()
+                    .map(item => {
+
+                        const ky =
+                            (data.xo_so_ky || [])
+                                .find(
+                                    x =>
+                                        x.id === item.ky_id
+                                );
+
+                        return {
+
+                            ...item,
+
+                            ket_qua:
+                                ky
+                                    ? ky.ket_qua
+                                    : null
+                        };
+                    });
+
+            return res.json({
+
+                thanh_cong: true,
+
+                lich_su:
+                    history
+
+            });
+
+        } catch (error) {
+
+            console.error(
+                "Lỗi lịch sử Xổ Số:",
+                error
+            );
+
+            return res.status(500).json({
+                thanh_cong: false,
+                thong_bao:
+                    "Lỗi máy chủ"
+            });
+        }
+    }
+);
+
+
 /* =========================================================
    XỬ LÝ LỖI
    ========================================================= */
@@ -2500,6 +3236,8 @@ async function startServer() {
 
     await db.ready;
     await ensureAdmin();
+
+    khoiDongXoSo();
 
     app.listen(
         PORT,
