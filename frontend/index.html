@@ -8085,12 +8085,15 @@ async function taoPhongDiceDuel(){
     const cuoc =
         Number(input?.value || 0);
 
-    console.log(
-        "DICE DUEL DEBUG:",
-        "value =", input?.value,
-        "cuoc =", cuoc,
-        "isInteger =", Number.isInteger(cuoc)
-    );
+    const debugBox =
+        document.getElementById("diceDuelStatus");
+
+    if(debugBox){
+        debugBox.textContent =
+            "DEBUG: value=" + String(input?.value) +
+            " | cuoc=" + String(cuoc) +
+            " | integer=" + String(Number.isInteger(cuoc));
+    }
 
     if(
         !Number.isInteger(cuoc) ||
