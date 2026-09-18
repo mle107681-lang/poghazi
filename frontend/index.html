@@ -8232,17 +8232,13 @@ function hienThiKetQuaDiceDuel(phong){
         phong.ket_qua || {};
 
     const d1 =
-        Array.isArray(
-            kq.xuc_xac_1
-        )
-            ? kq.xuc_xac_1
+        Array.isArray(kq.dice_1)
+            ? kq.dice_1
             : [];
 
     const d2 =
-        Array.isArray(
-            kq.xuc_xac_2
-        )
-            ? kq.xuc_xac_2
+        Array.isArray(kq.dice_2)
+            ? kq.dice_2
             : [];
 
     const icon = n => ({
@@ -8254,71 +8250,180 @@ function hienThiKetQuaDiceDuel(phong){
         6:"⚅"
     }[n] || "🎲");
 
+    const diem1 =
+        Number(
+            kq.diem_1 ??
+            d1.reduce((a,b)=>a+b,0)
+        );
+
+    const diem2 =
+        Number(
+            kq.diem_2 ??
+            d2.reduce((a,b)=>a+b,0)
+        );
+
+    const myToken =
+        localStorage.getItem("poghazi_token") ||
+        localStorage.getItem("token");
+
+    let userId = null;
+
+    try{
+        const payload =
+            myToken
+                ? JSON.parse(
+                    atob(
+                        myToken
+                            .split(".")[1]
+                            .replace(/-/g,"+")
+                            .replace(/_/g,"/")
+                    )
+                )
+                : null;
+
+        userId =
+            payload?.id ??
+            payload?.user_id ??
+            null;
+
+    }catch(e){
+        userId = null;
+    }
+
+    const nguoiThang =
+        Number(kq.nguoi_thang);
+
+    let ketQuaCaNhan =
+        "🎲 TRẬN ĐẤU ĐÃ KẾT THÚC";
+
+    if(
+        userId !== null &&
+        nguoiThang === userId
+    ){
+        ketQuaCaNhan =
+            "🏆 BẠN THẮNG!";
+    }else if(
+        userId !== null &&
+        (
+            Number(kq.nguoi_thua) ===
+            userId
+        )
+    ){
+        ketQuaCaNhan =
+            "💀 BẠN THUA!";
+    }
+
     status.innerHTML = `
 
         <div class="dice-duel-result">
 
-            <h2>🎲 KẾT QUẢ</h2>
+            <h2>🎲 KẾT QUẢ DICE DUEL</h2>
 
-            <div style="margin-top:18px">
+            <div style="
+                margin-top:15px;
+                font-size:22px;
+                font-weight:900;
+            ">
+                ${ketQuaCaNhan}
+            </div>
+
+            <div style="margin-top:20px">
 
                 <b>
-                    Người chơi 1
+                    👤 Người chơi 1
                 </b>
 
                 <div class="dice-duel-dice">
                     ${d1.map(icon).join(" ")}
                 </div>
 
-                Tổng:
-                ${d1.reduce(
-                    (a,b)=>a+b,
-                    0
-                )}
+                <div>
+                    Tổng:
+                    <strong>
+                        ${diem1}
+                    </strong>
+                </div>
+
+                ${
+                    kq.bo_ba_1
+                        ? '<div style="margin-top:6px">🔥 BỘ BA ' +
+                          Number(kq.gia_tri_bo_ba_1 || 0) +
+                          '</div>'
+                        : ''
+                }
 
             </div>
 
-            <div
-                style="
-                    margin:20px 0;
-                    font-size:24px;
-                "
-            >
+            <div style="
+                margin:20px 0;
+                font-size:24px;
+            ">
                 ⚔️ VS ⚔️
             </div>
 
             <div>
 
                 <b>
-                    Người chơi 2
+                    👤 Người chơi 2
                 </b>
 
                 <div class="dice-duel-dice">
                     ${d2.map(icon).join(" ")}
                 </div>
 
-                Tổng:
-                ${d2.reduce(
-                    (a,b)=>a+b,
-                    0
-                )}
+                <div>
+                    Tổng:
+                    <strong>
+                        ${diem2}
+                    </strong>
+                </div>
+
+                ${
+                    kq.bo_ba_2
+                        ? '<div style="margin-top:6px">🔥 BỘ BA ' +
+                          Number(kq.gia_tri_bo_ba_2 || 0) +
+                          '</div>'
+                        : ''
+                }
 
             </div>
 
-            <div
-                style="
-                    margin-top:20px;
-                    font-size:20px;
-                    font-weight:800;
-                "
-            >
-                ${kq.thong_bao || "Trận đấu đã kết thúc."}
+            <div style="
+                margin-top:20px;
+                padding:12px;
+                border-radius:12px;
+                background:rgba(139,92,246,.12);
+                font-size:18px;
+                font-weight:800;
+            ">
+
+                🏆 Người thắng:
+                ${
+                    Number(kq.nguoi_thang) ===
+                    Number(phong.nguoi_choi_1?.user_id)
+                        ? "Người chơi 1"
+                        : "Người chơi 2"
+                }
+
+                <br>
+
+                🪙 Nhận:
+                ${Number(kq.coin_thang || 0).toLocaleString("vi-VN")}
+                Coin
+
+                ${
+                    Number(kq.so_lan_roll || 1) > 1
+                        ? `<br><span style="color:#9ca3af">
+                            🔄 Roll ${kq.so_lan_roll} lần do có hòa
+                           </span>`
+                        : ""
+                }
+
             </div>
 
         </div>
     `;
 }
-
 
 async function taiLichSuDiceDuel(){
 
@@ -8344,9 +8449,7 @@ async function taiLichSuDiceDuel(){
             return;
         }
 
-        if(
-            data.lich_su.length === 0
-        ){
+        if(data.lich_su.length === 0){
 
             box.innerHTML =
                 '<div style="color:#9ca3af">Chưa có trận đấu.</div>';
@@ -8354,37 +8457,239 @@ async function taiLichSuDiceDuel(){
             return;
         }
 
+        const icon = n => ({
+            1:"⚀",
+            2:"⚁",
+            3:"⚂",
+            4:"⚃",
+            5:"⚄",
+            6:"⚅"
+        }[n] || "🎲");
+
         box.innerHTML =
             data.lich_su
                 .slice(0,10)
-                .map(item => `
+                .map(item => {
 
-                    <div
-                        style="
-                            padding:12px 0;
+                    const kq =
+                        item.ket_qua || {};
+
+                    const d1 =
+                        Array.isArray(kq.dice_1)
+                            ? kq.dice_1
+                            : [];
+
+                    const d2 =
+                        Array.isArray(kq.dice_2)
+                            ? kq.dice_2
+                            : [];
+
+                    const diem1 =
+                        Number(
+                            kq.diem_1 ??
+                            d1.reduce(
+                                (a,b)=>a+b,
+                                0
+                            )
+                        );
+
+                    const diem2 =
+                        Number(
+                            kq.diem_2 ??
+                            d2.reduce(
+                                (a,b)=>a+b,
+                                0
+                            )
+                        );
+
+                    const nguoiThang =
+                        Number(
+                            kq.nguoi_thang
+                        );
+
+                    const p1 =
+                        item.nguoi_choi_1 || {};
+
+                    const p2 =
+                        item.nguoi_choi_2 || {};
+
+                    const tenThang =
+                        nguoiThang ===
+                        Number(p1.user_id)
+                            ? "Người chơi 1"
+                            : nguoiThang ===
+                              Number(p2.user_id)
+                                ? "Người chơi 2"
+                                : "Không xác định";
+
+                    return `
+
+                        <div style="
+                            padding:16px 0;
                             border-bottom:1px solid #252936;
-                        "
-                    >
+                        ">
 
-                        🎲 Phòng
-                        ${item.ma_phong || "?"}
+                            <div style="
+                                font-weight:900;
+                                font-size:16px;
+                            ">
+                                🎲 Phòng
+                                ${item.ma_phong || "?"}
+                            </div>
 
-                        <br>
+                            <div style="
+                                margin-top:7px;
+                                color:#cbd5e1;
+                            ">
+                                🪙 Cược:
+                                ${Number(
+                                    item.tien_cuoc || 0
+                                ).toLocaleString("vi-VN")}
+                                Coin
+                            </div>
 
-                        🪙 Cược:
-                        ${Number(
-                            item.cuoc || 0
-                        ).toLocaleString()}
-                        Coin
+                            <div style="
+                                margin-top:14px;
+                                display:grid;
+                                gap:12px;
+                            ">
 
-                        <br>
+                                <div style="
+                                    padding:12px;
+                                    border-radius:12px;
+                                    background:rgba(255,255,255,.04);
+                                ">
 
-                        🏆
-                        ${item.thong_bao || ""}
+                                    <b>👤 Người chơi 1</b>
 
-                    </div>
+                                    <div style="
+                                        font-size:30px;
+                                        margin:7px 0;
+                                        letter-spacing:5px;
+                                    ">
+                                        ${
+                                            d1.length
+                                                ? d1.map(icon).join(" ")
+                                                : "🎲 🎲 🎲"
+                                        }
+                                    </div>
 
-                `)
+                                    <div>
+                                        Tổng:
+                                        <strong>
+                                            ${diem1}
+                                        </strong>
+                                    </div>
+
+                                    ${
+                                        kq.bo_ba_1
+                                            ? `
+                                                <div style="
+                                                    margin-top:5px;
+                                                    font-weight:800;
+                                                ">
+                                                    🔥 Bộ ba
+                                                    ${Number(
+                                                        kq.gia_tri_bo_ba_1 || 0
+                                                    )}
+                                                </div>
+                                            `
+                                            : ""
+                                    }
+
+                                </div>
+
+                                <div style="
+                                    text-align:center;
+                                    font-size:20px;
+                                ">
+                                    ⚔️ VS ⚔️
+                                </div>
+
+                                <div style="
+                                    padding:12px;
+                                    border-radius:12px;
+                                    background:rgba(255,255,255,.04);
+                                ">
+
+                                    <b>👤 Người chơi 2</b>
+
+                                    <div style="
+                                        font-size:30px;
+                                        margin:7px 0;
+                                        letter-spacing:5px;
+                                    ">
+                                        ${
+                                            d2.length
+                                                ? d2.map(icon).join(" ")
+                                                : "🎲 🎲 🎲"
+                                        }
+                                    </div>
+
+                                    <div>
+                                        Tổng:
+                                        <strong>
+                                            ${diem2}
+                                        </strong>
+                                    </div>
+
+                                    ${
+                                        kq.bo_ba_2
+                                            ? `
+                                                <div style="
+                                                    margin-top:5px;
+                                                    font-weight:800;
+                                                ">
+                                                    🔥 Bộ ba
+                                                    ${Number(
+                                                        kq.gia_tri_bo_ba_2 || 0
+                                                    )}
+                                                </div>
+                                            `
+                                            : ""
+                                    }
+
+                                </div>
+
+                            </div>
+
+                            <div style="
+                                margin-top:14px;
+                                padding:12px;
+                                border-radius:12px;
+                                background:rgba(139,92,246,.12);
+                                font-weight:800;
+                            ">
+
+                                🏆 Thắng:
+                                ${tenThang}
+
+                                <br>
+
+                                🪙 Nhận:
+                                ${Number(
+                                    kq.coin_thang || 0
+                                ).toLocaleString("vi-VN")}
+                                Coin
+
+                                ${
+                                    Number(
+                                        kq.so_lan_roll || 1
+                                    ) > 1
+                                        ? `
+                                            <br>
+                                            🔄 Roll lại:
+                                            ${kq.so_lan_roll} lần
+                                        `
+                                        : ""
+                                }
+
+                            </div>
+
+                        </div>
+
+                    `;
+                })
                 .join("");
 
     }catch(e){
@@ -8396,7 +8701,6 @@ async function taiLichSuDiceDuel(){
 
     }
 }
-
 
 /* Tự tải khi mở Dice Duel */
 const oldShowPageDiceDuel = window.showPage;
