@@ -890,7 +890,224 @@ td{
         font-size:25px;
     }
 }
-\n</style>
+\n
+/* =========================================================
+   POGHAZI PVP
+   ========================================================= */
+
+
+.pvp-card{
+    background:rgba(255,255,255,.035);
+    border:1px solid rgba(167,139,250,.14);
+    border-radius:16px;
+    padding:18px;
+    margin-top:16px;
+}
+
+.pvp-box{
+    background:linear-gradient(
+        145deg,
+        rgba(139,92,246,.12),
+        rgba(15,17,21,.96)
+    );
+    border:1px solid rgba(139,92,246,.28);
+    border-radius:18px;
+    padding:20px;
+    margin-top:15px;
+    box-shadow:0 10px 35px rgba(0,0,0,.25);
+}
+
+.pvp-title{
+    font-size:24px;
+    font-weight:800;
+    margin-bottom:6px;
+}
+
+.pvp-subtitle{
+    color:var(--muted);
+    font-size:14px;
+    margin-bottom:18px;
+}
+
+.pvp-coin{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    background:rgba(255,255,255,.04);
+    border:1px solid rgba(255,255,255,.07);
+    padding:14px 16px;
+    border-radius:12px;
+    margin-bottom:18px;
+}
+
+.pvp-coin strong{
+    color:#facc15;
+}
+
+.pvp-colors{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:10px;
+    margin:12px 0 18px;
+}
+
+.pvp-color{
+    border:1px solid rgba(255,255,255,.12);
+    background:#151820;
+    color:#fff;
+    border-radius:12px;
+    padding:13px 8px;
+    cursor:pointer;
+    font-weight:700;
+    transition:.2s;
+}
+
+.pvp-color:hover{
+    transform:translateY(-2px);
+    border-color:#8b5cf6;
+}
+
+.pvp-color.selected{
+    border-color:#a78bfa;
+    box-shadow:0 0 0 2px rgba(167,139,250,.2);
+    background:rgba(139,92,246,.18);
+}
+
+.pvp-color-dot{
+    width:14px;
+    height:14px;
+    border-radius:50%;
+    display:inline-block;
+    vertical-align:middle;
+    margin-right:5px;
+}
+
+.pvp-red{background:#ef4444}
+.pvp-green{background:#22c55e}
+.pvp-blue{background:#3b82f6}
+.pvp-yellow{background:#eab308}
+.pvp-purple{background:#a855f7}
+.pvp-orange{background:#f97316}
+
+.pvp-input{
+    width:100%;
+    padding:13px 14px;
+    border-radius:11px;
+    border:1px solid rgba(255,255,255,.1);
+    background:#0b0d11;
+    color:#fff;
+    outline:none;
+    margin-bottom:10px;
+}
+
+.pvp-btn{
+    width:100%;
+    padding:13px;
+    border:0;
+    border-radius:11px;
+    background:#8b5cf6;
+    color:#fff;
+    font-weight:800;
+    cursor:pointer;
+}
+
+.pvp-btn:hover{
+    background:#7c3aed;
+}
+
+.pvp-btn-danger{
+    background:#dc2626;
+}
+
+.pvp-room{
+    background:rgba(255,255,255,.035);
+    border:1px solid rgba(255,255,255,.08);
+    border-radius:14px;
+    padding:15px;
+    margin-top:10px;
+}
+
+.pvp-room-head{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:10px;
+}
+
+.pvp-room-code{
+    font-weight:800;
+    color:#a78bfa;
+}
+
+.pvp-room-info{
+    color:var(--muted);
+    font-size:13px;
+    margin:7px 0 12px;
+}
+
+.pvp-room-btn{
+    padding:9px 13px;
+    border:0;
+    border-radius:9px;
+    background:#8b5cf6;
+    color:white;
+    font-weight:700;
+    cursor:pointer;
+}
+
+.pvp-result{
+    text-align:center;
+    padding:18px;
+    border-radius:14px;
+    background:rgba(255,255,255,.04);
+    margin-top:15px;
+}
+
+.pvp-dice{
+    display:flex;
+    justify-content:center;
+    flex-wrap:wrap;
+    gap:8px;
+    margin:12px 0;
+}
+
+.pvp-die{
+    width:52px;
+    height:52px;
+    border-radius:12px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:24px;
+    background:#171a22;
+    border:1px solid rgba(255,255,255,.1);
+}
+
+.pvp-section-title{
+    font-size:17px;
+    font-weight:800;
+    margin:22px 0 10px;
+}
+
+.pvp-note{
+    color:var(--muted);
+    font-size:12px;
+    line-height:1.5;
+    margin-top:12px;
+}
+
+@media(max-width:600px){
+    .pvp-colors{
+        grid-template-columns:repeat(2,1fr);
+    }
+
+    .pvp-room-head{
+        align-items:flex-start;
+        flex-direction:column;
+    }
+}
+
+</style>
 </head>
 
 <body>
@@ -1151,6 +1368,14 @@ td{
         onclick="showPage('xo-so',this)"
     >
         🎟️ Xổ Số
+    </button>
+
+
+    <button
+        class="nav-item"
+        onclick="showPage('pvp',this)"
+    >
+        ⚔️ PvP Color Battle
     </button>
 
 
@@ -1847,7 +2072,109 @@ td{
                 📜 Lịch sử Xổ Số
             </h3>
 
-            <div
+
+<!-- ==================== PVP COLOR BATTLE ==================== -->
+<div id="page-pvp" class="page" style="display:none;">
+    <div class="pvp-box">
+
+        <div class="pvp-header">
+            <div>
+                <div class="pvp-title">⚔️ PvP COLOR BATTLE</div>
+                <div class="pvp-subtitle">Đấu 1v1 bằng coin ảo</div>
+            </div>
+
+            <div class="pvp-coin-box">
+                🪙 <span id="pvpCoin">0</span> COIN
+            </div>
+        </div>
+
+        <div class="pvp-card">
+            <div class="pvp-section-title">🎨 Chọn màu của bạn</div>
+
+            <div class="pvp-colors">
+
+                <button class="pvp-color-btn"
+                    data-color="do"
+                    onclick="chonMauPvP('do',this)">
+                    🔴 ĐỎ
+                </button>
+
+                <button class="pvp-color-btn"
+                    data-color="xanh_la"
+                    onclick="chonMauPvP('xanh_la',this)">
+                    🟢 XANH LÁ
+                </button>
+
+                <button class="pvp-color-btn"
+                    data-color="xanh_duong"
+                    onclick="chonMauPvP('xanh_duong',this)">
+                    🔵 XANH DƯƠNG
+                </button>
+
+                <button class="pvp-color-btn"
+                    data-color="vang"
+                    onclick="chonMauPvP('vang',this)">
+                    🟡 VÀNG
+                </button>
+
+                <button class="pvp-color-btn"
+                    data-color="tim"
+                    onclick="chonMauPvP('tim',this)">
+                    🟣 TÍM
+                </button>
+
+                <button class="pvp-color-btn"
+                    data-color="cam"
+                    onclick="chonMauPvP('cam',this)">
+                    🟠 CAM
+                </button>
+
+            </div>
+
+            <div class="pvp-section-title">🪙 Mức cược</div>
+
+            <input
+                id="pvpBet"
+                class="pvp-input"
+                type="number"
+                min="10"
+                step="1"
+                placeholder="Nhập số coin muốn cược"
+            >
+
+            <button class="pvp-main-btn" onclick="taoPhongPvP()">
+                ⚔️ TẠO PHÒNG PvP
+            </button>
+        </div>
+
+        <div class="pvp-card">
+            <div class="pvp-section-title">🏠 Phòng đang chờ</div>
+
+            <div id="pvpRooms">
+                <div class="pvp-empty">Đang tải phòng...</div>
+            </div>
+        </div>
+
+        <div id="pvpCurrent" class="pvp-card" style="display:none;"></div>
+
+        <div class="pvp-card">
+            <div class="pvp-section-title">📜 Lịch sử PvP</div>
+
+            <div id="pvpHistory">
+                <div class="pvp-empty">Chưa có trận đấu.</div>
+            </div>
+        </div>
+
+        <div class="pvp-note">
+            ℹ️ Coin trong PvP là <b>coin ảo</b>, chỉ dùng để chơi giải trí
+            trên POGHAZI và <b>không thể đổi thành tiền thật</b>.
+        </div>
+
+    </div>
+</div>
+<!-- ==================== END PVP COLOR BATTLE ==================== -->
+
+<div
                 id="xosoHistory"
             >
                 Đang tải...
@@ -6472,6 +6799,889 @@ async function loadColorDiceHistory() {
 }
 
 startApp();
+
+</script>
+
+
+<script>
+/* =========================================================
+   POGHAZI PVP JAVASCRIPT
+   ========================================================= */
+
+let pvpMauDangChon = null;
+let pvpPhongHienTai = null;
+let pvpPolling = null;
+
+
+function pvpEsc(value){
+
+    return String(value ?? '')
+        .replace(/&/g,'&amp;')
+        .replace(/</g,'&lt;')
+        .replace(/>/g,'&gt;')
+        .replace(/"/g,'&quot;')
+        .replace(/'/g,'&#039;');
+}
+
+
+function pvpMauTen(mau){
+
+    const names = {
+        do:'Đỏ',
+        xanh_la:'Xanh lá',
+        xanh_duong:'Xanh dương',
+        vang:'Vàng',
+        tim:'Tím',
+        cam:'Cam'
+    };
+
+    return names[mau] || mau;
+}
+
+
+function pvpMauEmoji(mau){
+
+    const emoji = {
+        do:'🔴',
+        xanh_la:'🟢',
+        xanh_duong:'🔵',
+        vang:'🟡',
+        tim:'🟣',
+        cam:'🟠'
+    };
+
+    return emoji[mau] || '⚪';
+}
+
+
+function chonMauPvP(mau, button){
+
+    pvpMauDangChon = mau;
+
+    document
+        .querySelectorAll('.pvp-color')
+        .forEach(
+            x => x.classList.remove('selected')
+        );
+
+    if(button){
+        button.classList.add('selected');
+    }
+}
+
+
+async function pvpApi(url, options = {}){
+
+    if(typeof api === 'function'){
+        return await api(url, options);
+    }
+
+    const token =
+        localStorage.getItem('poghazi_token');
+
+    const response =
+        await fetch(
+            url,
+            {
+                ...options,
+                headers:{
+                    'Content-Type':'application/json',
+                    ...(options.headers || {}),
+                    ...(token
+                        ? {
+                            Authorization:
+                                'Bearer ' + token
+                        }
+                        : {})
+                }
+            }
+        );
+
+    return await response.json();
+}
+
+
+async function capNhatCoinPvP(){
+
+    try{
+
+        const data =
+            await pvpApi(
+                '/api/thong-tin-tai-khoan'
+            );
+
+        if(
+            data &&
+            data.thanh_cong
+        ){
+
+            const coin =
+                Number(
+                    data.user?.coin ??
+                    data.coin ??
+                    0
+                );
+
+            const box =
+                document.getElementById(
+                    'pvpCoin'
+                );
+
+            if(box){
+                box.textContent =
+                    coin.toLocaleString();
+            }
+        }
+
+    }catch(e){
+
+        console.error(
+            'Lỗi cập nhật Coin PvP:',
+            e
+        );
+    }
+}
+
+
+async function taoPhongPvP(){
+
+    if(!pvpMauDangChon){
+
+        alert(
+            'Hãy chọn màu trước.'
+        );
+
+        return;
+    }
+
+    const input =
+        document.getElementById(
+            'pvpBet'
+        );
+
+    const tienCuoc =
+        Number(
+            input?.value
+        );
+
+    if(
+        !Number.isInteger(tienCuoc) ||
+        tienCuoc < 10 ||
+        tienCuoc > 1000000
+    ){
+
+        alert(
+            'Tiền cược phải từ 10 đến 1.000.000 Coin.'
+        );
+
+        return;
+    }
+
+    try{
+
+        const data =
+            await pvpApi(
+                '/api/pvp/tao-phong',
+                {
+                    method:'POST',
+
+                    body:JSON.stringify({
+
+                        mau:
+                            pvpMauDangChon,
+
+                        tien_cuoc:
+                            tienCuoc
+
+                    })
+                }
+            );
+
+        if(!data.thanh_cong){
+
+            alert(
+                data.thong_bao ||
+                data.message ||
+                'Không thể tạo phòng.'
+            );
+
+            return;
+        }
+
+        pvpPhongHienTai =
+            data.phong;
+
+        alert(
+            'Đã tạo phòng ' +
+            data.phong.ma_phong
+        );
+
+        if(input){
+            input.value = '';
+        }
+
+        await capNhatCoinPvP();
+        await taiPhongPvP();
+        hienThiPhongPvP(data.phong);
+
+        batDauPollingPvP(
+            data.phong.ma_phong
+        );
+
+    }catch(e){
+
+        console.error(e);
+
+        alert(
+            'Không thể tạo phòng PvP.'
+        );
+    }
+}
+
+
+async function taiPhongPvP(){
+
+    const box =
+        document.getElementById(
+            'pvpRooms'
+        );
+
+    if(!box) return;
+
+    try{
+
+        const data =
+            await pvpApi(
+                '/api/pvp/phong'
+            );
+
+        if(
+            !data.thanh_cong ||
+            !Array.isArray(data.phong) ||
+            data.phong.length === 0
+        ){
+
+            box.innerHTML =
+                '<div class="pvp-note">' +
+                'Hiện chưa có phòng đang chờ.' +
+                '</div>';
+
+            return;
+        }
+
+        box.innerHTML =
+            data.phong
+                .map(
+                    phong => `
+
+                    <div class="pvp-room">
+
+                        <div class="pvp-room-head">
+
+                            <div>
+                                <div class="pvp-room-code">
+                                    PHÒNG ${pvpEsc(phong.ma_phong)}
+                                </div>
+
+                                <div class="pvp-room-info">
+                                    Chủ phòng:
+                                    ${pvpEsc(phong.nguoi_tao)}
+                                    <br>
+                                    Màu:
+                                    ${pvpMauEmoji(phong.mau)}
+                                    ${pvpMauTen(phong.mau)}
+                                    <br>
+                                    Cược:
+                                    ${Number(
+                                        phong.tien_cuoc
+                                    ).toLocaleString()}
+                                    Coin
+                                </div>
+                            </div>
+
+                            <button
+                                class="pvp-room-btn"
+                                onclick="thamGiaPhongPvP('${pvpEsc(phong.ma_phong)}')">
+                                ⚔️ Tham gia
+                            </button>
+
+                        </div>
+
+                    </div>
+
+                    `
+                )
+                .join('');
+
+    }catch(e){
+
+        console.error(
+            'Lỗi tải phòng PvP:',
+            e
+        );
+
+        box.innerHTML =
+            '<div class="pvp-note">' +
+            'Không thể tải danh sách phòng.' +
+            '</div>';
+    }
+}
+
+
+async function thamGiaPhongPvP(maPhong){
+
+    if(!pvpMauDangChon){
+
+        alert(
+            'Hãy chọn màu trước.'
+        );
+
+        return;
+    }
+
+    try{
+
+        const data =
+            await pvpApi(
+                '/api/pvp/tham-gia',
+                {
+                    method:'POST',
+
+                    body:JSON.stringify({
+
+                        ma_phong:
+                            maPhong,
+
+                        mau:
+                            pvpMauDangChon
+
+                    })
+                }
+            );
+
+        if(!data.thanh_cong){
+
+            alert(
+                data.thong_bao ||
+                data.message ||
+                'Không thể tham gia phòng.'
+            );
+
+            return;
+        }
+
+        pvpPhongHienTai =
+            data.phong;
+
+        await capNhatCoinPvP();
+        await taiPhongPvP();
+
+        hienThiPhongPvP(
+            data.phong
+        );
+
+        hienThiKetQuaPvP(
+            data.phong
+        );
+
+        alert(
+            'Trận PvP đã kết thúc!'
+        );
+
+    }catch(e){
+
+        console.error(e);
+
+        alert(
+            'Không thể tham gia PvP.'
+        );
+    }
+}
+
+
+function hienThiPhongPvP(phong){
+
+    const box =
+        document.getElementById(
+            'pvpCurrent'
+        );
+
+    if(!box || !phong) return;
+
+    const p1 =
+        phong.nguoi_choi_1;
+
+    const p2 =
+        phong.nguoi_choi_2;
+
+    let html = `
+
+        <div class="pvp-result">
+
+            <div>
+                <strong>
+                    PHÒNG ${pvpEsc(phong.ma_phong)}
+                </strong>
+            </div>
+
+            <div class="pvp-note">
+                Cược:
+                ${Number(
+                    phong.tien_cuoc
+                ).toLocaleString()}
+                Coin
+            </div>
+
+            <hr style="
+                border:0;
+                border-top:1px solid rgba(255,255,255,.08);
+                margin:15px 0;
+            ">
+
+            <div>
+                ${pvpMauEmoji(p1?.mau)}
+                ${pvpEsc(p1?.email)}
+                <br>
+                Màu:
+                ${pvpMauTen(p1?.mau)}
+            </div>
+    `;
+
+    if(p2){
+
+        html += `
+
+            <div style="margin-top:15px;">
+                VS
+            </div>
+
+            <div style="margin-top:15px;">
+                ${pvpMauEmoji(p2?.mau)}
+                ${pvpEsc(p2?.email)}
+                <br>
+                Màu:
+                ${pvpMauTen(p2?.mau)}
+            </div>
+
+        `;
+
+    }else{
+
+        html += `
+
+            <div class="pvp-note"
+                 style="margin-top:18px;">
+                ⏳ Đang chờ người chơi thứ 2...
+            </div>
+
+            <button
+                class="pvp-btn pvp-btn-danger"
+                style="margin-top:12px;"
+                onclick="huyPhongPvP('${pvpEsc(phong.ma_phong)}')">
+                Hủy phòng & hoàn Coin
+            </button>
+
+        `;
+    }
+
+    html += '</div>';
+
+    box.innerHTML = html;
+}
+
+
+function hienThiKetQuaPvP(phong){
+
+    const box =
+        document.getElementById(
+            'pvpCurrent'
+        );
+
+    if(!box || !phong) return;
+
+    if(
+        phong.trang_thai !==
+        'da_ket_thuc'
+    ){
+
+        hienThiPhongPvP(phong);
+
+        return;
+    }
+
+    const p1 =
+        phong.nguoi_choi_1;
+
+    const p2 =
+        phong.nguoi_choi_2;
+
+    let ketQuaText =
+        '🤝 HÒA';
+
+    if(
+        phong.ket_qua ===
+        'nguoi_choi_1_thang'
+    ){
+        ketQuaText =
+            '🏆 NGƯỜI CHƠI 1 THẮNG';
+    }
+
+    if(
+        phong.ket_qua ===
+        'nguoi_choi_2_thang'
+    ){
+        ketQuaText =
+            '🏆 NGƯỜI CHƠI 2 THẮNG';
+    }
+
+    function diceHtml(dice){
+
+        if(!Array.isArray(dice)){
+            return '';
+        }
+
+        return dice
+            .map(
+                x =>
+                    `<div class="pvp-die">
+                        ${pvpMauEmoji(x)}
+                    </div>`
+            )
+            .join('');
+    }
+
+    box.innerHTML = `
+
+        <div class="pvp-result">
+
+            <h2>${ketQuaText}</h2>
+
+            <div class="pvp-section-title">
+                👤 ${pvpEsc(p1.email)}
+            </div>
+
+            <div>
+                ${pvpMauEmoji(p1.mau)}
+                Chọn ${pvpMauTen(p1.mau)}
+            </div>
+
+            <div class="pvp-dice">
+                ${diceHtml(p1.ket_qua)}
+            </div>
+
+            <strong>
+                Điểm: ${p1.diem}
+            </strong>
+
+            <div class="pvp-note">
+                Nhận:
+                ${Number(
+                    p1.coin_nhan || 0
+                ).toLocaleString()}
+                Coin
+            </div>
+
+
+            <div class="pvp-section-title">
+                👤 ${pvpEsc(p2.email)}
+            </div>
+
+            <div>
+                ${pvpMauEmoji(p2.mau)}
+                Chọn ${pvpMauTen(p2.mau)}
+            </div>
+
+            <div class="pvp-dice">
+                ${diceHtml(p2.ket_qua)}
+            </div>
+
+            <strong>
+                Điểm: ${p2.diem}
+            </strong>
+
+            <div class="pvp-note">
+                Nhận:
+                ${Number(
+                    p2.coin_nhan || 0
+                ).toLocaleString()}
+                Coin
+            </div>
+
+        </div>
+
+    `;
+
+    capNhatCoinPvP();
+    taiLichSuPvP();
+}
+
+
+async function kiemTraPhongPvP(maPhong){
+
+    try{
+
+        const data =
+            await pvpApi(
+                '/api/pvp/phong/' +
+                encodeURIComponent(maPhong)
+            );
+
+        if(!data.thanh_cong){
+            return;
+        }
+
+        pvpPhongHienTai =
+            data.phong;
+
+        hienThiPhongPvP(
+            data.phong
+        );
+
+        if(
+            data.phong.trang_thai ===
+            'da_ket_thuc'
+        ){
+
+            dungPollingPvP();
+
+            hienThiKetQuaPvP(
+                data.phong
+            );
+
+            taiPhongPvP();
+            capNhatCoinPvP();
+        }
+
+    }catch(e){
+
+        console.error(
+            'Lỗi kiểm tra phòng PvP:',
+            e
+        );
+    }
+}
+
+
+function batDauPollingPvP(maPhong){
+
+    dungPollingPvP();
+
+    pvpPolling =
+        setInterval(
+            () => {
+                kiemTraPhongPvP(
+                    maPhong
+                );
+            },
+            1500
+        );
+}
+
+
+function dungPollingPvP(){
+
+    if(pvpPolling){
+
+        clearInterval(
+            pvpPolling
+        );
+
+        pvpPolling = null;
+    }
+}
+
+
+async function huyPhongPvP(maPhong){
+
+    if(
+        !confirm(
+            'Bạn muốn hủy phòng và nhận lại Coin?'
+        )
+    ){
+        return;
+    }
+
+    try{
+
+        const data =
+            await pvpApi(
+                '/api/pvp/huy-phong',
+                {
+                    method:'POST',
+
+                    body:JSON.stringify({
+
+                        ma_phong:
+                            maPhong
+
+                    })
+                }
+            );
+
+        if(!data.thanh_cong){
+
+            alert(
+                data.thong_bao ||
+                'Không thể hủy phòng.'
+            );
+
+            return;
+        }
+
+        dungPollingPvP();
+
+        await capNhatCoinPvP();
+        await taiPhongPvP();
+
+        document.getElementById(
+            'pvpCurrent'
+        ).innerHTML =
+            '<div class="pvp-note">' +
+            'Đã hủy phòng và hoàn Coin.' +
+            '</div>';
+
+        alert(
+            'Đã hoàn Coin.'
+        );
+
+    }catch(e){
+
+        console.error(e);
+
+        alert(
+            'Không thể hủy phòng.'
+        );
+    }
+}
+
+
+async function taiLichSuPvP(){
+
+    const box =
+        document.getElementById(
+            'pvpHistory'
+        );
+
+    if(!box) return;
+
+    try{
+
+        const data =
+            await pvpApi(
+                '/api/pvp/lich-su'
+            );
+
+        if(
+            !data.thanh_cong ||
+            !Array.isArray(data.lich_su) ||
+            data.lich_su.length === 0
+        ){
+
+            box.innerHTML =
+                '<div class="pvp-note">' +
+                'Chưa có lịch sử PvP.' +
+                '</div>';
+
+            return;
+        }
+
+        box.innerHTML =
+            data.lich_su
+                .map(
+                    x => {
+
+                        let ketQua =
+                            'Hòa';
+
+                        if(
+                            x.ket_qua ===
+                            'nguoi_choi_1_thang'
+                        ){
+
+                            ketQua =
+                                'Người chơi 1 thắng';
+                        }
+
+                        if(
+                            x.ket_qua ===
+                            'nguoi_choi_2_thang'
+                        ){
+
+                            ketQua =
+                                'Người chơi 2 thắng';
+                        }
+
+                        return `
+
+                            <div class="pvp-room">
+
+                                <strong>
+                                    ${pvpEsc(x.match_id)}
+                                </strong>
+
+                                <div class="pvp-room-info">
+
+                                    ${pvpMauEmoji(x.user1_mau)}
+                                    ${pvpMauTen(x.user1_mau)}
+                                    -
+                                    ${x.user1_diem} điểm
+
+                                    <br>
+
+                                    ${pvpMauEmoji(x.user2_mau)}
+                                    ${pvpMauTen(x.user2_mau)}
+                                    -
+                                    ${x.user2_diem} điểm
+
+                                    <br>
+
+                                    Kết quả:
+                                    ${ketQua}
+
+                                </div>
+
+                            </div>
+
+                        `;
+                    }
+                )
+                .join('');
+
+    }catch(e){
+
+        console.error(
+            'Lỗi lịch sử PvP:',
+            e
+        );
+    }
+}
+
+
+/* Khi mở trang PvP */
+const oldShowPagePvP =
+    window.showPage;
+
+window.showPage =
+    function(page, element){
+
+        if(
+            typeof oldShowPagePvP ===
+            'function'
+        ){
+
+            oldShowPagePvP(
+                page,
+                element
+            );
+        }
+
+        if(page === 'pvp'){
+
+            capNhatCoinPvP();
+            taiPhongPvP();
+            taiLichSuPvP();
+        }
+    };
 
 </script>
 

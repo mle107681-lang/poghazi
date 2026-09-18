@@ -3213,6 +3213,1179 @@ app.get(
 );
 
 
+
+/* =========================================================
+   POGHAZI PVP - COLOR BATTLE
+   Coin ảo - không quy đổi tiền thật
+   ========================================================= */
+
+const PVP_COLORS = [
+    'do',
+    'xanh_la',
+    'xanh_duong',
+    'vang',
+    'tim',
+    'cam'
+];
+
+const PVP_BET_MIN = 10;
+const PVP_BET_MAX = 1000000;
+const PVP_DICE_COUNT = 4;
+
+
+/* =========================
+   KHỞI TẠO DỮ LIỆU PVP
+   ========================= */
+
+function ensurePvPData(data) {
+
+    if (!Array.isArray(data.pvp_phong)) {
+        data.pvp_phong = [];
+    }
+
+    if (!Array.isArray(data.lichsu_pvp)) {
+        data.lichsu_pvp = [];
+    }
+
+    if (!Number.isInteger(data.nextPvpRoomId)) {
+        data.nextPvpRoomId = 1;
+    }
+
+    if (!Number.isInteger(data.nextPvpMatchId)) {
+        data.nextPvpMatchId = 1;
+    }
+}
+
+
+/* =========================
+   TÌM USER
+   ========================= */
+
+function timUserPvP(data, userId) {
+
+    return data.users.find(
+        u => Number(u.id) === Number(userId)
+    );
+}
+
+
+/* =========================
+   TẠO MÃ PHÒNG
+   ========================= */
+
+function taoMaPhongPvP(data) {
+
+    let ma;
+
+    do {
+        ma = crypto
+            .randomBytes(3)
+            .toString('hex')
+            .toUpperCase();
+
+    } while (
+        data.pvp_phong.some(
+            p => p.ma_phong === ma
+        )
+    );
+
+    return ma;
+}
+
+
+/* =========================
+   ROLL XÚC XẮC
+   ========================= */
+
+function rollPvPDice() {
+
+    const ketQua = [];
+
+    for (let i = 0; i < PVP_DICE_COUNT; i++) {
+
+        ketQua.push(
+            PVP_COLORS[
+                crypto.randomInt(
+                    0,
+                    PVP_COLORS.length
+                )
+            ]
+        );
+    }
+
+    return ketQua;
+}
+
+
+/* =========================
+   TÍNH ĐIỂM
+   ========================= */
+
+function tinhDiemPvP(dice, mau) {
+
+    return dice.filter(
+        x => x === mau
+    ).length;
+}
+
+
+/* =========================
+   KẾT THÚC TRẬN
+   ========================= */
+
+function xuLyKetThucPvP(phong) {
+
+    if (
+        ![
+            'dang_cho',
+            'dang_cho_ket_qua'
+        ].includes(phong.trang_thai)
+    ) {
+        return phong;
+    }
+
+    if (
+        !phong.nguoi_choi_1 ||
+        !phong.nguoi_choi_2
+    ) {
+        return phong;
+    }
+
+    const data = getDB();
+
+    ensurePvPData(data);
+
+    const p1 = timUserPvP(
+        data,
+        phong.nguoi_choi_1.user_id
+    );
+
+    const p2 = timUserPvP(
+        data,
+        phong.nguoi_choi_2.user_id
+    );
+
+    if (!p1 || !p2) {
+
+        phong.trang_thai =
+            'loi_tai_khoan';
+
+        phong.ket_qua_text =
+            'Không tìm thấy tài khoản người chơi';
+
+        saveDB();
+
+        return phong;
+    }
+
+    if (typeof p1.coin !== 'number') {
+        p1.coin = 1000;
+    }
+
+    if (typeof p2.coin !== 'number') {
+        p2.coin = 1000;
+    }
+
+    const dice1 = rollPvPDice();
+    const dice2 = rollPvPDice();
+
+    const diem1 = tinhDiemPvP(
+        dice1,
+        phong.nguoi_choi_1.mau
+    );
+
+    const diem2 = tinhDiemPvP(
+        dice2,
+        phong.nguoi_choi_2.mau
+    );
+
+    const cuoc = Number(
+        phong.tien_cuoc
+    );
+
+    let ketQua = 'hoa';
+    let nguoiThang = null;
+
+    let coinNhan1 = cuoc;
+    let coinNhan2 = cuoc;
+
+    if (diem1 > diem2) {
+
+        ketQua = 'nguoi_choi_1_thang';
+
+        nguoiThang =
+            p1.id;
+
+        coinNhan1 =
+            cuoc * 2;
+
+        coinNhan2 =
+            0;
+
+    } else if (diem2 > diem1) {
+
+        ketQua = 'nguoi_choi_2_thang';
+
+        nguoiThang =
+            p2.id;
+
+        coinNhan1 =
+            0;
+
+        coinNhan2 =
+            cuoc * 2;
+    }
+
+    p1.coin += coinNhan1;
+    p2.coin += coinNhan2;
+
+    phong.nguoi_choi_1.ket_qua =
+        dice1;
+
+    phong.nguoi_choi_1.diem =
+        diem1;
+
+    phong.nguoi_choi_1.coin_nhan =
+        coinNhan1;
+
+    phong.nguoi_choi_2.ket_qua =
+        dice2;
+
+    phong.nguoi_choi_2.diem =
+        diem2;
+
+    phong.nguoi_choi_2.coin_nhan =
+        coinNhan2;
+
+    phong.nguoi_thang =
+        nguoiThang;
+
+    phong.ket_qua =
+        ketQua;
+
+    phong.trang_thai =
+        'da_ket_thuc';
+
+    phong.match_id =
+        'PVP' +
+        data.nextPvpMatchId++;
+
+    phong.thoi_gian_ket_thuc =
+        new Date().toISOString();
+
+    if (!Array.isArray(data.lichsu_giao_dich)) {
+        data.lichsu_giao_dich = [];
+    }
+
+    const now =
+        new Date().toISOString();
+
+    data.lichsu_giao_dich.push({
+
+        id:
+            data.lichsu_giao_dich.length + 1,
+
+        user_id:
+            p1.id,
+
+        loai:
+            'pvp',
+
+        so_tien:
+            coinNhan1 - cuoc,
+
+        noi_dung:
+            `PvP ${phong.match_id} - ${
+                ketQua === 'hoa'
+                    ? 'Hòa'
+                    : (
+                        nguoiThang === p1.id
+                            ? 'Thắng'
+                            : 'Thua'
+                    )
+            }`,
+
+        thoi_gian:
+            now
+    });
+
+    data.lichsu_giao_dich.push({
+
+        id:
+            data.lichsu_giao_dich.length + 1,
+
+        user_id:
+            p2.id,
+
+        loai:
+            'pvp',
+
+        so_tien:
+            coinNhan2 - cuoc,
+
+        noi_dung:
+            `PvP ${phong.match_id} - ${
+                ketQua === 'hoa'
+                    ? 'Hòa'
+                    : (
+                        nguoiThang === p2.id
+                            ? 'Thắng'
+                            : 'Thua'
+                    )
+            }`,
+
+        thoi_gian:
+            now
+    });
+
+    data.lichsu_pvp.push({
+
+        id:
+            data.lichsu_pvp.length + 1,
+
+        match_id:
+            phong.match_id,
+
+        ma_phong:
+            phong.ma_phong,
+
+        user1_id:
+            p1.id,
+
+        user1_email:
+            p1.email,
+
+        user1_mau:
+            phong.nguoi_choi_1.mau,
+
+        user1_diem:
+            diem1,
+
+        user1_coin_cuoc:
+            cuoc,
+
+        user1_coin_nhan:
+            coinNhan1,
+
+        user2_id:
+            p2.id,
+
+        user2_email:
+            p2.email,
+
+        user2_mau:
+            phong.nguoi_choi_2.mau,
+
+        user2_diem:
+            diem2,
+
+        user2_coin_cuoc:
+            cuoc,
+
+        user2_coin_nhan:
+            coinNhan2,
+
+        ket_qua:
+            ketQua,
+
+        nguoi_thang:
+            nguoiThang,
+
+        thoi_gian:
+            now
+    });
+
+    saveDB();
+
+    return phong;
+}
+
+
+/* =========================
+   TẠO PHÒNG
+   ========================= */
+
+app.post(
+    '/api/pvp/tao-phong',
+    auth,
+    (req, res) => {
+
+        try {
+
+            const mau =
+                String(
+                    req.body.mau || ''
+                ).trim();
+
+            const tienCuoc =
+                Number(
+                    req.body.tien_cuoc
+                );
+
+            if (!PVP_COLORS.includes(mau)) {
+
+                return res.status(400).json({
+                    thanh_cong: false,
+                    thong_bao:
+                        'Màu không hợp lệ'
+                });
+            }
+
+            if (
+                !Number.isInteger(tienCuoc) ||
+                tienCuoc < PVP_BET_MIN ||
+                tienCuoc > PVP_BET_MAX
+            ) {
+
+                return res.status(400).json({
+                    thanh_cong: false,
+                    thong_bao:
+                        `Tiền cược phải từ ${PVP_BET_MIN.toLocaleString()} đến ${PVP_BET_MAX.toLocaleString()} Coin`
+                });
+            }
+
+            const data = getDB();
+
+            ensurePvPData(data);
+
+            const user =
+                timUserPvP(
+                    data,
+                    req.user.id
+                );
+
+            if (!user) {
+
+                return res.status(404).json({
+                    thanh_cong: false,
+                    thong_bao:
+                        'Không tìm thấy tài khoản'
+                });
+            }
+
+            if (typeof user.coin !== 'number') {
+                user.coin = 1000;
+            }
+
+            if (user.coin < tienCuoc) {
+
+                return res.status(400).json({
+                    thanh_cong: false,
+                    thong_bao:
+                        'Không đủ Coin'
+                });
+            }
+
+            const phongDangCho =
+                data.pvp_phong.find(
+                    p =>
+                        p.trang_thai === 'dang_cho' &&
+                        Number(
+                            p.nguoi_choi_1?.user_id
+                        ) === Number(user.id)
+                );
+
+            if (phongDangCho) {
+
+                return res.status(400).json({
+                    thanh_cong: false,
+                    thong_bao:
+                        'Bạn đang có một phòng PvP đang chờ'
+                });
+            }
+
+            user.coin -= tienCuoc;
+
+            const phong = {
+
+                id:
+                    data.nextPvpRoomId++,
+
+                ma_phong:
+                    taoMaPhongPvP(data),
+
+                tien_cuoc:
+                    tienCuoc,
+
+                trang_thai:
+                    'dang_cho',
+
+                nguoi_choi_1: {
+
+                    user_id:
+                        user.id,
+
+                    email:
+                        user.email,
+
+                    mau,
+
+                    ket_qua:
+                        null,
+
+                    diem:
+                        null,
+
+                    coin_nhan:
+                        0
+                },
+
+                nguoi_choi_2:
+                    null,
+
+                nguoi_thang:
+                    null,
+
+                ket_qua:
+                    null,
+
+                match_id:
+                    null,
+
+                ngay_tao:
+                    new Date().toISOString(),
+
+                thoi_gian_ket_thuc:
+                    null
+            };
+
+            data.pvp_phong.push(phong);
+
+            if (!Array.isArray(data.lichsu_giao_dich)) {
+                data.lichsu_giao_dich = [];
+            }
+
+            data.lichsu_giao_dich.push({
+
+                id:
+                    data.lichsu_giao_dich.length + 1,
+
+                user_id:
+                    user.id,
+
+                loai:
+                    'pvp_dat_cuoc',
+
+                so_tien:
+                    -tienCuoc,
+
+                noi_dung:
+                    `Tạo phòng PvP ${phong.ma_phong}`,
+
+                thoi_gian:
+                    new Date().toISOString()
+            });
+
+            saveDB();
+
+            return res.json({
+
+                thanh_cong:
+                    true,
+
+                thong_bao:
+                    'Đã tạo phòng PvP',
+
+                phong,
+
+                coin:
+                    user.coin
+
+            });
+
+        } catch (error) {
+
+            console.error(
+                'Lỗi tạo phòng PvP:',
+                error
+            );
+
+            return res.status(500).json({
+                thanh_cong: false,
+                thong_bao:
+                    'Lỗi máy chủ'
+            });
+        }
+    }
+);
+
+
+/* =========================
+   DANH SÁCH PHÒNG
+   ========================= */
+
+app.get(
+    '/api/pvp/phong',
+    auth,
+    (req, res) => {
+
+        try {
+
+            const data = getDB();
+
+            ensurePvPData(data);
+
+            const phong =
+                data.pvp_phong
+                    .filter(
+                        p =>
+                            p.trang_thai ===
+                            'dang_cho'
+                    )
+                    .slice()
+                    .reverse()
+                    .map(
+                        p => ({
+
+                            id:
+                                p.id,
+
+                            ma_phong:
+                                p.ma_phong,
+
+                            tien_cuoc:
+                                p.tien_cuoc,
+
+                            nguoi_tao:
+                                p.nguoi_choi_1?.email ||
+                                'Ẩn',
+
+                            mau:
+                                p.nguoi_choi_1?.mau,
+
+                            ngay_tao:
+                                p.ngay_tao
+                        })
+                    );
+
+            return res.json({
+
+                thanh_cong:
+                    true,
+
+                phong
+
+            });
+
+        } catch (error) {
+
+            console.error(
+                'Lỗi danh sách PvP:',
+                error
+            );
+
+            return res.status(500).json({
+                thanh_cong: false,
+                thong_bao:
+                    'Lỗi máy chủ'
+            });
+        }
+    }
+);
+
+
+/* =========================
+   THAM GIA PHÒNG
+   ========================= */
+
+app.post(
+    '/api/pvp/tham-gia',
+    auth,
+    (req, res) => {
+
+        try {
+
+            const maPhong =
+                String(
+                    req.body.ma_phong || ''
+                )
+                .trim()
+                .toUpperCase();
+
+            const mau =
+                String(
+                    req.body.mau || ''
+                ).trim();
+
+            if (!maPhong) {
+
+                return res.status(400).json({
+                    thanh_cong: false,
+                    thong_bao:
+                        'Thiếu mã phòng'
+                });
+            }
+
+            if (!PVP_COLORS.includes(mau)) {
+
+                return res.status(400).json({
+                    thanh_cong: false,
+                    thong_bao:
+                        'Màu không hợp lệ'
+                });
+            }
+
+            const data = getDB();
+
+            ensurePvPData(data);
+
+            const phong =
+                data.pvp_phong.find(
+                    p =>
+                        p.ma_phong === maPhong
+                );
+
+            if (!phong) {
+
+                return res.status(404).json({
+                    thanh_cong: false,
+                    thong_bao:
+                        'Không tìm thấy phòng'
+                });
+            }
+
+            if (phong.trang_thai !== 'dang_cho') {
+
+                return res.status(400).json({
+                    thanh_cong: false,
+                    thong_bao:
+                        'Phòng này không còn nhận người chơi'
+                });
+            }
+
+            const user =
+                timUserPvP(
+                    data,
+                    req.user.id
+                );
+
+            if (!user) {
+
+                return res.status(404).json({
+                    thanh_cong: false,
+                    thong_bao:
+                        'Không tìm thấy tài khoản'
+                });
+            }
+
+            if (
+                Number(
+                    phong.nguoi_choi_1.user_id
+                ) === Number(user.id)
+            ) {
+
+                return res.status(400).json({
+                    thanh_cong: false,
+                    thong_bao:
+                        'Bạn không thể tham gia phòng của chính mình'
+                });
+            }
+
+            if (
+                phong.nguoi_choi_1.mau === mau
+            ) {
+
+                return res.status(400).json({
+                    thanh_cong: false,
+                    thong_bao:
+                        'Hai người chơi phải chọn màu khác nhau'
+                });
+            }
+
+            if (typeof user.coin !== 'number') {
+                user.coin = 1000;
+            }
+
+            const tienCuoc =
+                Number(
+                    phong.tien_cuoc
+                );
+
+            if (user.coin < tienCuoc) {
+
+                return res.status(400).json({
+                    thanh_cong: false,
+                    thong_bao:
+                        'Không đủ Coin để tham gia'
+                });
+            }
+
+            user.coin -= tienCuoc;
+
+            phong.nguoi_choi_2 = {
+
+                user_id:
+                    user.id,
+
+                email:
+                    user.email,
+
+                mau,
+
+                ket_qua:
+                    null,
+
+                diem:
+                    null,
+
+                coin_nhan:
+                    0
+            };
+
+            phong.trang_thai =
+                'dang_cho_ket_qua';
+
+            phong.thoi_gian_tham_gia =
+                new Date().toISOString();
+
+            if (!Array.isArray(data.lichsu_giao_dich)) {
+                data.lichsu_giao_dich = [];
+            }
+
+            data.lichsu_giao_dich.push({
+
+                id:
+                    data.lichsu_giao_dich.length + 1,
+
+                user_id:
+                    user.id,
+
+                loai:
+                    'pvp_dat_cuoc',
+
+                so_tien:
+                    -tienCuoc,
+
+                noi_dung:
+                    `Tham gia phòng PvP ${phong.ma_phong}`,
+
+                thoi_gian:
+                    new Date().toISOString()
+            });
+
+            xuLyKetThucPvP(phong);
+
+            saveDB();
+
+            return res.json({
+
+                thanh_cong:
+                    true,
+
+                thong_bao:
+                    'Trận PvP đã bắt đầu',
+
+                phong,
+
+                coin:
+                    user.coin
+
+            });
+
+        } catch (error) {
+
+            console.error(
+                'Lỗi tham gia PvP:',
+                error
+            );
+
+            return res.status(500).json({
+                thanh_cong: false,
+                thong_bao:
+                    'Lỗi máy chủ'
+            });
+        }
+    }
+);
+
+
+/* =========================
+   XEM PHÒNG
+   ========================= */
+
+app.get(
+    '/api/pvp/phong/:ma',
+    auth,
+    (req, res) => {
+
+        try {
+
+            const maPhong =
+                String(
+                    req.params.ma || ''
+                )
+                .trim()
+                .toUpperCase();
+
+            const data = getDB();
+
+            ensurePvPData(data);
+
+            const phong =
+                data.pvp_phong.find(
+                    p =>
+                        p.ma_phong === maPhong
+                );
+
+            if (!phong) {
+
+                return res.status(404).json({
+                    thanh_cong: false,
+                    thong_bao:
+                        'Không tìm thấy phòng'
+                });
+            }
+
+            const user =
+                timUserPvP(
+                    data,
+                    req.user.id
+                );
+
+            if (!user) {
+
+                return res.status(404).json({
+                    thanh_cong: false,
+                    thong_bao:
+                        'Không tìm thấy tài khoản'
+                });
+            }
+
+            return res.json({
+
+                thanh_cong:
+                    true,
+
+                phong,
+
+                coin:
+                    Number(
+                        user.coin || 0
+                    )
+
+            });
+
+        } catch (error) {
+
+            console.error(
+                'Lỗi xem phòng PvP:',
+                error
+            );
+
+            return res.status(500).json({
+                thanh_cong: false,
+                thong_bao:
+                    'Lỗi máy chủ'
+            });
+        }
+    }
+);
+
+
+/* =========================
+   HỦY PHÒNG
+   ========================= */
+
+app.post(
+    '/api/pvp/huy-phong',
+    auth,
+    (req, res) => {
+
+        try {
+
+            const maPhong =
+                String(
+                    req.body.ma_phong || ''
+                )
+                .trim()
+                .toUpperCase();
+
+            const data = getDB();
+
+            ensurePvPData(data);
+
+            const phong =
+                data.pvp_phong.find(
+                    p =>
+                        p.ma_phong === maPhong
+                );
+
+            if (!phong) {
+
+                return res.status(404).json({
+                    thanh_cong: false,
+                    thong_bao:
+                        'Không tìm thấy phòng'
+                });
+            }
+
+            if (phong.trang_thai !== 'dang_cho') {
+
+                return res.status(400).json({
+                    thanh_cong: false,
+                    thong_bao:
+                        'Không thể hủy phòng này'
+                });
+            }
+
+            if (
+                Number(
+                    phong.nguoi_choi_1.user_id
+                ) !== Number(req.user.id)
+            ) {
+
+                return res.status(403).json({
+                    thanh_cong: false,
+                    thong_bao:
+                        'Bạn không phải chủ phòng'
+                });
+            }
+
+            const user =
+                timUserPvP(
+                    data,
+                    req.user.id
+                );
+
+            if (!user) {
+
+                return res.status(404).json({
+                    thanh_cong: false,
+                    thong_bao:
+                        'Không tìm thấy tài khoản'
+                });
+            }
+
+            user.coin +=
+                Number(
+                    phong.tien_cuoc
+                );
+
+            phong.trang_thai =
+                'da_huy';
+
+            phong.thoi_gian_huy =
+                new Date().toISOString();
+
+            phong.ket_qua_text =
+                'Chủ phòng đã hủy phòng';
+
+            if (!Array.isArray(data.lichsu_giao_dich)) {
+                data.lichsu_giao_dich = [];
+            }
+
+            data.lichsu_giao_dich.push({
+
+                id:
+                    data.lichsu_giao_dich.length + 1,
+
+                user_id:
+                    user.id,
+
+                loai:
+                    'pvp_hoan_coin',
+
+                so_tien:
+                    Number(
+                        phong.tien_cuoc
+                    ),
+
+                noi_dung:
+                    `Hoàn Coin do hủy phòng ${phong.ma_phong}`,
+
+                thoi_gian:
+                    new Date().toISOString()
+            });
+
+            saveDB();
+
+            return res.json({
+
+                thanh_cong:
+                    true,
+
+                thong_bao:
+                    'Đã hủy phòng và hoàn Coin',
+
+                coin:
+                    user.coin
+
+            });
+
+        } catch (error) {
+
+            console.error(
+                'Lỗi hủy phòng PvP:',
+                error
+            );
+
+            return res.status(500).json({
+                thanh_cong: false,
+                thong_bao:
+                    'Lỗi máy chủ'
+            });
+        }
+    }
+);
+
+
+/* =========================
+   LỊCH SỬ PVP
+   ========================= */
+
+app.get(
+    '/api/pvp/lich-su',
+    auth,
+    (req, res) => {
+
+        try {
+
+            const data = getDB();
+
+            ensurePvPData(data);
+
+            const userId =
+                Number(
+                    req.user.id
+                );
+
+            const lichSu =
+                data.lichsu_pvp
+                    .filter(
+                        x =>
+                            Number(x.user1_id) === userId ||
+                            Number(x.user2_id) === userId
+                    )
+                    .slice(-30)
+                    .reverse();
+
+            return res.json({
+
+                thanh_cong:
+                    true,
+
+                lich_su:
+                    lichSu
+
+            });
+
+        } catch (error) {
+
+            console.error(
+                'Lỗi lịch sử PvP:',
+                error
+            );
+
+            return res.status(500).json({
+                thanh_cong: false,
+                thong_bao:
+                    'Lỗi máy chủ'
+            });
+        }
+    }
+);
+
+
 /* =========================================================
    XỬ LÝ LỖI
    ========================================================= */
