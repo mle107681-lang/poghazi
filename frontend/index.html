@@ -8085,6 +8085,13 @@ async function taoPhongDiceDuel(){
     const cuoc =
         Number(input?.value || 0);
 
+    console.log(
+        "DICE DUEL DEBUG:",
+        "value =", input?.value,
+        "cuoc =", cuoc,
+        "isInteger =", Number.isInteger(cuoc)
+    );
+
     if(
         !Number.isInteger(cuoc) ||
         cuoc < 10 ||
