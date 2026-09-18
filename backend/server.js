@@ -3716,21 +3716,21 @@ app.post(
                 });
             }
 
-            const phongDangCho =
-                data.pvp_phong.find(
+            const soPhongDangCho =
+                data.pvp_phong.filter(
                     p =>
                         p.trang_thai === 'dang_cho' &&
                         Number(
                             p.nguoi_choi_1?.user_id
                         ) === Number(user.id)
-                );
+                ).length;
 
-            if (phongDangCho) {
+            if (soPhongDangCho >= 10) {
 
                 return res.status(400).json({
                     thanh_cong: false,
                     thong_bao:
-                        'Bạn đang có một phòng PvP đang chờ'
+                        'Bạn chỉ được tạo tối đa 10 phòng PvP đang chờ'
                 });
             }
 
