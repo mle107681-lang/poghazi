@@ -7958,38 +7958,31 @@ async function capNhatCoinDiceDuel(){
 
     try{
 
-        let coin = Number(
-            window.account?.coin ?? 0
-        );
-
-        if(!coin){
-
-            const data =
-                await diceDuelApi(
-                    "/api/thong-tin-tai-khoan"
-                );
-
-            const user =
-                data.user ||
-                data.tai_khoan ||
-                data.nguoi_dung ||
-                data;
-
-            coin = Number(
-                user?.coin ?? 0
+        const data =
+            await api(
+                "/api/thong-tin-tai-khoan"
             );
 
-        }
+        const user =
+            data?.user ||
+            data?.tai_khoan ||
+            data?.nguoi_dung ||
+            data;
+
+        const coin =
+            Number(user?.coin ?? 0);
 
         const box =
             document.getElementById(
                 "diceDuelCoin"
             );
 
-        if(box && Number.isFinite(coin)){
+        if(box){
 
             box.textContent =
-                coin.toLocaleString("vi-VN");
+                Number.isFinite(coin)
+                ? coin.toLocaleString("vi-VN")
+                : "0";
 
         }
 
