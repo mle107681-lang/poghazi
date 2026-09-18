@@ -1113,6 +1113,128 @@ td{
     }
 }
 
+
+/* =========================
+   DICE DUEL UI
+   ========================= */
+.dice-duel-card{
+    max-width:900px;
+    margin:20px auto;
+    padding:24px;
+    background:#11141b;
+    border:1px solid #292d39;
+    border-radius:18px;
+}
+
+.dice-duel-title{
+    font-size:28px;
+    font-weight:800;
+    margin-bottom:8px;
+}
+
+.dice-duel-subtitle{
+    color:#9ca3af;
+    margin-bottom:20px;
+}
+
+.dice-duel-coin{
+    display:inline-block;
+    padding:9px 14px;
+    margin-bottom:18px;
+    border-radius:10px;
+    background:#191522;
+    border:1px solid #35285a;
+    color:#c4b5fd;
+    font-weight:700;
+}
+
+.dice-duel-input{
+    width:100%;
+    padding:13px;
+    margin:8px 0 14px;
+    border-radius:10px;
+    border:1px solid #303542;
+    background:#0b0e13;
+    color:#fff;
+    outline:none;
+}
+
+.dice-duel-input:focus{
+    border-color:#8b5cf6;
+}
+
+.dice-duel-btn{
+    width:100%;
+    padding:13px;
+    border:0;
+    border-radius:11px;
+    background:#8b5cf6;
+    color:#fff;
+    font-weight:800;
+    cursor:pointer;
+}
+
+.dice-duel-section{
+    margin-top:25px;
+    padding-top:20px;
+    border-top:1px solid #252936;
+}
+
+.dice-duel-room{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:12px;
+    padding:15px;
+    margin:10px 0;
+    background:#0d1016;
+    border:1px solid #292d39;
+    border-radius:12px;
+}
+
+.dice-duel-room button{
+    padding:9px 14px;
+    border:0;
+    border-radius:9px;
+    background:#8b5cf6;
+    color:#fff;
+    font-weight:700;
+}
+
+.dice-duel-status{
+    margin-top:20px;
+    padding:14px;
+    border-radius:11px;
+    background:#0b0e13;
+    white-space:pre-line;
+}
+
+.dice-duel-result{
+    text-align:center;
+    padding:20px;
+    border-radius:14px;
+    background:#17121f;
+    border:1px solid #49336f;
+}
+
+.dice-duel-dice{
+    font-size:38px;
+    letter-spacing:6px;
+    margin:10px 0;
+}
+
+@media(max-width:600px){
+    .dice-duel-card{
+        margin:12px;
+        padding:18px;
+    }
+
+    .dice-duel-room{
+        flex-direction:column;
+        align-items:stretch;
+    }
+}
+
 </style>
 </head>
 
@@ -1376,6 +1498,13 @@ td{
         🎟️ Xổ Số
     </button>
 
+
+    <button
+        class="nav-item"
+        onclick="showPage('dice-duel',this)"
+    >
+        🎲 Dice Duel
+    </button>
 
     <button
         class="nav-item"
@@ -2633,6 +2762,75 @@ td{
     class="toast"
 ></div>
 
+
+
+<!-- =========================
+     DICE DUEL
+     ========================= -->
+<div id="page-dice-duel" class="page">
+
+    <div class="dice-duel-card">
+
+        <div class="dice-duel-title">
+            🎲 Dice Duel
+        </div>
+
+        <div class="dice-duel-subtitle">
+            2 người đấu xúc xắc bằng Coin ảo
+        </div>
+
+        <div class="dice-duel-coin">
+            🪙 Coin:
+            <span id="diceDuelCoin">0</span>
+        </div>
+
+        <label>Mức cược</label>
+
+        <input
+            id="diceDuelStake"
+            class="dice-duel-input"
+            type="number"
+            min="10"
+            max="1000000"
+            value="100"
+            placeholder="Nhập số Coin"
+        >
+
+        <button
+            class="dice-duel-btn"
+            onclick="taoPhongDiceDuel()"
+        >
+            🎲 TẠO PHÒNG
+        </button>
+
+        <div class="dice-duel-section">
+
+            <h3>🚪 Phòng đang chờ</h3>
+
+            <div id="diceDuelRooms">
+                Đang tải phòng...
+            </div>
+
+        </div>
+
+        <div class="dice-duel-section">
+
+            <h3>📜 Lịch sử</h3>
+
+            <div id="diceDuelHistory">
+                Chưa có lịch sử.
+            </div>
+
+        </div>
+
+        <div
+            id="diceDuelStatus"
+            class="dice-duel-status"
+        ></div>
+
+    </div>
+
+</div>
 
 <script>
 
@@ -7724,5 +7922,497 @@ window.showPage =
 startApp();
 </script>
 
+
+<script>
+
+/* =========================
+   DICE DUEL FRONTEND
+   ========================= */
+
+async function diceDuelApi(url, options = {}){
+
+    const token =
+        localStorage.getItem("poghazi_token") ||
+        localStorage.getItem("token");
+
+    options.headers = {
+        ...(options.headers || {}),
+        "Content-Type":"application/json"
+    };
+
+    if(token){
+        options.headers.Authorization =
+            "Bearer " + token;
+    }
+
+    const res = await fetch(
+        API + url,
+        options
+    );
+
+    return await res.json();
+}
+
+
+async function capNhatCoinDiceDuel(){
+
+    try{
+
+        const data =
+            await diceDuelApi(
+                "/api/thong-tin-tai-khoan"
+            );
+
+        if(data && data.thanh_cong){
+
+            const coin = Number(
+                data.user?.coin ??
+                data.nguoi_dung?.coin ??
+                data.tai_khoan?.coin ??
+                data.coin ??
+                0
+            );
+
+            const box =
+                document.getElementById(
+                    "diceDuelCoin"
+                );
+
+            if(
+                box &&
+                Number.isFinite(coin)
+            ){
+                box.textContent =
+                    coin.toLocaleString();
+            }
+        }
+
+    }catch(e){
+
+        console.error(
+            "Lỗi Coin Dice Duel:",
+            e
+        );
+
+    }
+}
+
+
+async function taiPhongDiceDuel(){
+
+    const box =
+        document.getElementById(
+            "diceDuelRooms"
+        );
+
+    if(!box) return;
+
+    try{
+
+        const data =
+            await diceDuelApi(
+                "/api/dice-duel/phong"
+            );
+
+        if(
+            !data ||
+            !data.thanh_cong ||
+            !Array.isArray(data.phong)
+        ){
+            box.innerHTML =
+                "Không tải được phòng.";
+            return;
+        }
+
+        if(data.phong.length === 0){
+
+            box.innerHTML =
+                '<div style="color:#9ca3af">Chưa có phòng nào đang chờ.</div>';
+
+            return;
+        }
+
+        box.innerHTML =
+            data.phong.map(phong => `
+
+                <div class="dice-duel-room">
+
+                    <div>
+
+                        <b>
+                            🎲 Phòng ${phong.ma_phong}
+                        </b>
+
+                        <div
+                            style="color:#9ca3af;margin-top:5px"
+                        >
+                            🪙 Cược:
+                            ${Number(
+                                phong.cuoc || 0
+                            ).toLocaleString()}
+                            Coin
+                        </div>
+
+                    </div>
+
+                    <button
+                        onclick="thamGiaDiceDuel('${phong.ma_phong}')"
+                    >
+                        THAM GIA
+                    </button>
+
+                </div>
+
+            `).join("");
+
+    }catch(e){
+
+        console.error(e);
+
+        box.innerHTML =
+            "Lỗi tải phòng.";
+
+    }
+}
+
+
+async function taoPhongDiceDuel(){
+
+    const input =
+        document.getElementById(
+            "diceDuelStake"
+        );
+
+    const cuoc =
+        Number(input?.value || 0);
+
+    if(
+        !Number.isInteger(cuoc) ||
+        cuoc < 10 ||
+        cuoc > 1000000
+    ){
+
+        alert(
+            "Mức cược phải từ 10 đến 1.000.000 Coin."
+        );
+
+        return;
+    }
+
+    try{
+
+        const data =
+            await diceDuelApi(
+                "/api/dice-duel/tao-phong",
+                {
+                    method:"POST",
+                    body:JSON.stringify({
+                        cuoc
+                    })
+                }
+            );
+
+        if(
+            !data ||
+            !data.thanh_cong
+        ){
+
+            alert(
+                data?.thong_bao ||
+                "Không thể tạo phòng."
+            );
+
+            return;
+        }
+
+        document.getElementById(
+            "diceDuelStatus"
+        ).textContent =
+            "✅ Đã tạo phòng " +
+            (
+                data.phong?.ma_phong ||
+                ""
+            ) +
+            ". Đang chờ người chơi thứ 2...";
+
+        await capNhatCoinDiceDuel();
+        await taiPhongDiceDuel();
+
+    }catch(e){
+
+        console.error(e);
+
+        alert(
+            "Lỗi kết nối máy chủ."
+        );
+
+    }
+}
+
+
+async function thamGiaDiceDuel(maPhong){
+
+    if(
+        !confirm(
+            "Bạn muốn tham gia phòng " +
+            maPhong +
+            "?"
+        )
+    ){
+        return;
+    }
+
+    try{
+
+        const data =
+            await diceDuelApi(
+                "/api/dice-duel/tham-gia",
+                {
+                    method:"POST",
+                    body:JSON.stringify({
+                        ma_phong:maPhong
+                    })
+                }
+            );
+
+        if(
+            !data ||
+            !data.thanh_cong
+        ){
+
+            alert(
+                data?.thong_bao ||
+                "Không thể tham gia."
+            );
+
+            return;
+        }
+
+        hienThiKetQuaDiceDuel(
+            data.phong
+        );
+
+        await capNhatCoinDiceDuel();
+        await taiPhongDiceDuel();
+
+    }catch(e){
+
+        console.error(e);
+
+        alert(
+            "Lỗi kết nối máy chủ."
+        );
+
+    }
+}
+
+
+function hienThiKetQuaDiceDuel(phong){
+
+    const status =
+        document.getElementById(
+            "diceDuelStatus"
+        );
+
+    if(
+        !status ||
+        !phong
+    ) return;
+
+    const kq =
+        phong.ket_qua || {};
+
+    const d1 =
+        Array.isArray(
+            kq.xuc_xac_1
+        )
+            ? kq.xuc_xac_1
+            : [];
+
+    const d2 =
+        Array.isArray(
+            kq.xuc_xac_2
+        )
+            ? kq.xuc_xac_2
+            : [];
+
+    const icon = n => ({
+        1:"⚀",
+        2:"⚁",
+        3:"⚂",
+        4:"⚃",
+        5:"⚄",
+        6:"⚅"
+    }[n] || "🎲");
+
+    status.innerHTML = `
+
+        <div class="dice-duel-result">
+
+            <h2>🎲 KẾT QUẢ</h2>
+
+            <div style="margin-top:18px">
+
+                <b>
+                    Người chơi 1
+                </b>
+
+                <div class="dice-duel-dice">
+                    ${d1.map(icon).join(" ")}
+                </div>
+
+                Tổng:
+                ${d1.reduce(
+                    (a,b)=>a+b,
+                    0
+                )}
+
+            </div>
+
+            <div
+                style="
+                    margin:20px 0;
+                    font-size:24px;
+                "
+            >
+                ⚔️ VS ⚔️
+            </div>
+
+            <div>
+
+                <b>
+                    Người chơi 2
+                </b>
+
+                <div class="dice-duel-dice">
+                    ${d2.map(icon).join(" ")}
+                </div>
+
+                Tổng:
+                ${d2.reduce(
+                    (a,b)=>a+b,
+                    0
+                )}
+
+            </div>
+
+            <div
+                style="
+                    margin-top:20px;
+                    font-size:20px;
+                    font-weight:800;
+                "
+            >
+                ${kq.thong_bao || "Trận đấu đã kết thúc."}
+            </div>
+
+        </div>
+    `;
+}
+
+
+async function taiLichSuDiceDuel(){
+
+    const box =
+        document.getElementById(
+            "diceDuelHistory"
+        );
+
+    if(!box) return;
+
+    try{
+
+        const data =
+            await diceDuelApi(
+                "/api/dice-duel/lich-su"
+            );
+
+        if(
+            !data ||
+            !data.thanh_cong ||
+            !Array.isArray(data.lich_su)
+        ){
+            return;
+        }
+
+        if(
+            data.lich_su.length === 0
+        ){
+
+            box.innerHTML =
+                '<div style="color:#9ca3af">Chưa có trận đấu.</div>';
+
+            return;
+        }
+
+        box.innerHTML =
+            data.lich_su
+                .slice(0,10)
+                .map(item => `
+
+                    <div
+                        style="
+                            padding:12px 0;
+                            border-bottom:1px solid #252936;
+                        "
+                    >
+
+                        🎲 Phòng
+                        ${item.ma_phong || "?"}
+
+                        <br>
+
+                        🪙 Cược:
+                        ${Number(
+                            item.cuoc || 0
+                        ).toLocaleString()}
+                        Coin
+
+                        <br>
+
+                        🏆
+                        ${item.thong_bao || ""}
+
+                    </div>
+
+                `)
+                .join("");
+
+    }catch(e){
+
+        console.error(
+            "Lỗi lịch sử Dice Duel:",
+            e
+        );
+
+    }
+}
+
+
+/* Tự tải khi mở Dice Duel */
+const oldShowPageDiceDuel = window.showPage;
+
+window.showPage = function(page, element){
+
+    if(
+        typeof oldShowPageDiceDuel ===
+        "function"
+    ){
+        oldShowPageDiceDuel(
+            page,
+            element
+        );
+    }
+
+    if(page === "dice-duel"){
+
+        capNhatCoinDiceDuel();
+        taiPhongDiceDuel();
+        taiLichSuDiceDuel();
+
+    }
+};
+
+</script>
 </body>
 </html>
