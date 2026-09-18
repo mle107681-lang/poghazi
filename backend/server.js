@@ -880,6 +880,7 @@ app.get(
                 id: user.id,
                 email: user.email,
                 so_du: user.so_du,
+                coin: user.coin ?? 0,
                 la_admin:
                     user.la_admin,
                 ngay_tao:
