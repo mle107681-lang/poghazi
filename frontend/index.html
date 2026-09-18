@@ -7958,33 +7958,39 @@ async function capNhatCoinDiceDuel(){
 
     try{
 
-        const data =
-            await diceDuelApi(
-                "/api/thong-tin-tai-khoan"
-            );
+        let coin = Number(
+            window.account?.coin ?? 0
+        );
 
-        if(data && data.thanh_cong){
+        if(!coin){
 
-            const coin = Number(
-                data.user?.coin ??
-                data.nguoi_dung?.coin ??
-                data.tai_khoan?.coin ??
-                data.coin ??
-                0
-            );
-
-            const box =
-                document.getElementById(
-                    "diceDuelCoin"
+            const data =
+                await diceDuelApi(
+                    "/api/thong-tin-tai-khoan"
                 );
 
-            if(
-                box &&
-                Number.isFinite(coin)
-            ){
-                box.textContent =
-                    coin.toLocaleString();
-            }
+            const user =
+                data.user ||
+                data.tai_khoan ||
+                data.nguoi_dung ||
+                data;
+
+            coin = Number(
+                user?.coin ?? 0
+            );
+
+        }
+
+        const box =
+            document.getElementById(
+                "diceDuelCoin"
+            );
+
+        if(box && Number.isFinite(coin)){
+
+            box.textContent =
+                coin.toLocaleString("vi-VN");
+
         }
 
     }catch(e){
@@ -7995,8 +8001,8 @@ async function capNhatCoinDiceDuel(){
         );
 
     }
-}
 
+}
 
 async function taiPhongDiceDuel(){
 
