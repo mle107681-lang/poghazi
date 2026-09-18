@@ -6911,34 +6911,62 @@ async function pvpApi(url, options = {}){
 
 async function capNhatCoinPvP(){
 
+    const box =
+        document.getElementById('pvpCoin');
+
+    if(!box) return;
+
     try{
 
+        /*
+         * Lấy số dư Coin mới nhất từ server.
+         */
         const data =
             await pvpApi(
                 '/api/thong-tin-tai-khoan'
             );
 
+        if(!data){
+            return;
+        }
+
+        let coin = null;
+
+        /*
+         * Hỗ trợ nhiều dạng response
+         * để không phụ thuộc một cấu trúc duy nhất.
+         */
         if(
-            data &&
-            data.thanh_cong
+            data.user &&
+            data.user.coin !== undefined
         ){
+            coin = Number(data.user.coin);
+        }
+        else if(
+            data.nguoi_dung &&
+            data.nguoi_dung.coin !== undefined
+        ){
+            coin = Number(data.nguoi_dung.coin);
+        }
+        else if(
+            data.tai_khoan &&
+            data.tai_khoan.coin !== undefined
+        ){
+            coin = Number(data.tai_khoan.coin);
+        }
+        else if(data.coin !== undefined){
+            coin = Number(data.coin);
+        }
 
-            const coin =
-                Number(
-                    data.user?.coin ??
-                    data.coin ??
-                    0
-                );
-
-            const box =
-                document.getElementById(
-                    'pvpCoin'
-                );
-
-            if(box){
-                box.textContent =
-                    coin.toLocaleString();
-            }
+        /*
+         * Chỉ cập nhật khi server trả về Coin hợp lệ.
+         */
+        if(
+            coin !== null &&
+            Number.isFinite(coin)
+        ){
+            box.textContent =
+                Math.max(0, coin).toLocaleString();
         }
 
     }catch(e){
