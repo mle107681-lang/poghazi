@@ -4369,6 +4369,945 @@ app.post(
 );
 
 
+
+
+/* =========================================================
+   DICE DUEL - 2 NGƯỜI ĐẤU XÚC XẮC
+   ========================================================= */
+
+const DICE_DUEL_BET_MIN = 10;
+const DICE_DUEL_BET_MAX = 1000000;
+const DICE_DUEL_ROLL_COUNT = 3;
+
+function ensureDiceDuelData(data){
+
+    if(!Array.isArray(data.dice_duel_phong)){
+        data.dice_duel_phong = [];
+    }
+
+    if(!Array.isArray(data.lichsu_dice_duel)){
+        data.lichsu_dice_duel = [];
+    }
+
+    if(typeof data.nextDiceDuelRoomId !== 'number'){
+        data.nextDiceDuelRoomId = 1;
+    }
+}
+
+
+function taoMaDiceDuel(data){
+
+    const chars =
+        'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+
+    let ma;
+
+    do{
+
+        ma = '';
+
+        for(let i = 0; i < 5; i++){
+            ma += chars[
+                crypto.randomInt(0, chars.length)
+            ];
+        }
+
+    }while(
+        data.dice_duel_phong.some(
+            p => p.ma_phong === ma
+        )
+    );
+
+    return ma;
+}
+
+
+function rollDiceDuel(){
+
+    return [
+        crypto.randomInt(1, 7),
+        crypto.randomInt(1, 7),
+        crypto.randomInt(1, 7)
+    ];
+}
+
+
+function danhGiaDiceDuel(dice){
+
+    const a = Number(dice[0]);
+    const b = Number(dice[1]);
+    const c = Number(dice[2]);
+
+    const boBa =
+        a === b &&
+        b === c;
+
+    if(boBa){
+
+        return {
+            bo_ba: true,
+            diem_bo_ba: a,
+            tong: a + b + c,
+            xep_hang: 2,
+            mo_ta: `${a}${b}${c}`
+        };
+    }
+
+    return {
+        bo_ba: false,
+        diem_bo_ba: 0,
+        tong: a + b + c,
+        xep_hang: 1,
+        mo_ta: `${a} + ${b} + ${c}`
+    };
+}
+
+
+function xacDinhThangDiceDuel(
+    dice1,
+    dice2
+){
+
+    const kq1 =
+        danhGiaDiceDuel(dice1);
+
+    const kq2 =
+        danhGiaDiceDuel(dice2);
+
+    /*
+     * Bộ ba luôn ưu tiên hơn tổng điểm.
+     */
+    if(kq1.bo_ba && !kq2.bo_ba){
+        return {
+            ket_qua: 1,
+            kq1,
+            kq2
+        };
+    }
+
+    if(!kq1.bo_ba && kq2.bo_ba){
+        return {
+            ket_qua: 2,
+            kq1,
+            kq2
+        };
+    }
+
+    /*
+     * Cả hai đều là bộ ba:
+     * 666 > 555 > ... > 111
+     */
+    if(kq1.bo_ba && kq2.bo_ba){
+
+        if(kq1.diem_bo_ba > kq2.diem_bo_ba){
+            return {
+                ket_qua: 1,
+                kq1,
+                kq2
+            };
+        }
+
+        if(kq2.diem_bo_ba > kq1.diem_bo_ba){
+            return {
+                ket_qua: 2,
+                kq1,
+                kq2
+            };
+        }
+
+        return {
+            ket_qua: 0,
+            kq1,
+            kq2
+        };
+    }
+
+    /*
+     * Không có bộ ba:
+     * so tổng 3 viên.
+     */
+    if(kq1.tong > kq2.tong){
+
+        return {
+            ket_qua: 1,
+            kq1,
+            kq2
+        };
+    }
+
+    if(kq2.tong > kq1.tong){
+
+        return {
+            ket_qua: 2,
+            kq1,
+            kq2
+        };
+    }
+
+    return {
+        ket_qua: 0,
+        kq1,
+        kq2
+    };
+}
+
+
+function xuLyKetThucDiceDuel(phong){
+
+    const data = getDB();
+
+    ensureDiceDuelData(data);
+
+    const cuoc =
+        Number(phong.tien_cuoc);
+
+    let lanRoll = 0;
+    let dice1;
+    let dice2;
+    let ketQua;
+
+    /*
+     * Hai người cùng đấu trong một lượt.
+     *
+     * Nếu hòa -> tự động roll lại.
+     */
+    do{
+
+        lanRoll++;
+
+        dice1 =
+            rollDiceDuel();
+
+        dice2 =
+            rollDiceDuel();
+
+        ketQua =
+            xacDinhThangDiceDuel(
+                dice1,
+                dice2
+            );
+
+    }while(
+        ketQua.ket_qua === 0
+    );
+
+    const winner =
+        ketQua.ket_qua === 1
+            ? phong.nguoi_choi_1
+            : phong.nguoi_choi_2;
+
+    const loser =
+        ketQua.ket_qua === 1
+            ? phong.nguoi_choi_2
+            : phong.nguoi_choi_1;
+
+    const coinNhan =
+        cuoc * 2;
+
+    const userWinner =
+        timUserPvP(
+            data,
+            winner.user_id
+        );
+
+    if(userWinner){
+
+        if(typeof userWinner.coin !== 'number'){
+            userWinner.coin = 0;
+        }
+
+        userWinner.coin += coinNhan;
+    }
+
+    phong.trang_thai =
+        'da_ket_thuc';
+
+    phong.ket_qua = {
+        nguoi_thang:
+            winner.user_id,
+
+        nguoi_thua:
+            loser.user_id,
+
+        dice_1:
+            dice1,
+
+        dice_2:
+            dice2,
+
+        diem_1:
+            ketQua.kq1.tong,
+
+        diem_2:
+            ketQua.kq2.tong,
+
+        bo_ba_1:
+            ketQua.kq1.bo_ba,
+
+        bo_ba_2:
+            ketQua.kq2.bo_ba,
+
+        gia_tri_bo_ba_1:
+            ketQua.kq1.diem_bo_ba,
+
+        gia_tri_bo_ba_2:
+            ketQua.kq2.diem_bo_ba,
+
+        so_lan_roll:
+            lanRoll,
+
+        coin_thang:
+            coinNhan,
+
+        thoi_gian:
+            Date.now()
+    };
+
+    phong.nguoi_choi_1.coin_nhan =
+        ketQua.ket_qua === 1
+            ? coinNhan
+            : 0;
+
+    phong.nguoi_choi_2.coin_nhan =
+        ketQua.ket_qua === 2
+            ? coinNhan
+            : 0;
+
+    data.lichsu_dice_duel.push({
+        id:
+            data.nextDiceDuelRoomId++,
+
+        ma_phong:
+            phong.ma_phong,
+
+        nguoi_thang:
+            winner.user_id,
+
+        nguoi_thua:
+            loser.user_id,
+
+        nguoi_choi_1:
+            phong.nguoi_choi_1,
+
+        nguoi_choi_2:
+            phong.nguoi_choi_2,
+
+        ket_qua:
+            phong.ket_qua,
+
+        tien_cuoc:
+            cuoc,
+
+        thoi_gian:
+            Date.now()
+    });
+
+    saveDB();
+
+    return phong;
+}
+
+
+/* =========================
+   DICE DUEL - TẠO PHÒNG
+   ========================= */
+
+app.post(
+    '/api/dice-duel/tao-phong',
+    auth,
+    (req, res) => {
+
+        try{
+
+            const tienCuoc =
+                Number(
+                    req.body.tien_cuoc
+                );
+
+            if(
+                !Number.isInteger(tienCuoc) ||
+                tienCuoc < DICE_DUEL_BET_MIN ||
+                tienCuoc > DICE_DUEL_BET_MAX
+            ){
+
+                return res.status(400).json({
+                    thanh_cong: false,
+                    thong_bao:
+                        `Tiền cược phải từ ${DICE_DUEL_BET_MIN.toLocaleString()} đến ${DICE_DUEL_BET_MAX.toLocaleString()} Coin`
+                });
+            }
+
+            const data = getDB();
+
+            ensureDiceDuelData(data);
+
+            const user =
+                timUserPvP(
+                    data,
+                    req.user.id
+                );
+
+            if(!user){
+
+                return res.status(404).json({
+                    thanh_cong: false,
+                    thong_bao:
+                        'Không tìm thấy tài khoản'
+                });
+            }
+
+            if(typeof user.coin !== 'number'){
+                user.coin = 1000;
+            }
+
+            if(user.coin < tienCuoc){
+
+                return res.status(400).json({
+                    thanh_cong: false,
+                    thong_bao:
+                        'Không đủ Coin'
+                });
+            }
+
+            /*
+             * Trừ tiền cược ngay khi tạo phòng.
+             */
+            user.coin -= tienCuoc;
+
+            const phong = {
+
+                id:
+                    data.nextDiceDuelRoomId++,
+
+                ma_phong:
+                    taoMaDiceDuel(data),
+
+                tien_cuoc:
+                    tienCuoc,
+
+                trang_thai:
+                    'dang_cho',
+
+                nguoi_choi_1: {
+
+                    user_id:
+                        user.id,
+
+                    email:
+                        user.email,
+
+                    ket_qua:
+                        null,
+
+                    diem:
+                        null,
+
+                    coin_nhan:
+                        0
+                },
+
+                nguoi_choi_2:
+                    null,
+
+                ket_qua:
+                    null,
+
+                thoi_gian:
+                    Date.now()
+            };
+
+            data.dice_duel_phong.push(
+                phong
+            );
+
+            saveDB();
+
+            return res.json({
+
+                thanh_cong: true,
+
+                phong,
+
+                coin:
+                    user.coin
+            });
+
+        }catch(e){
+
+            console.error(
+                'Lỗi tạo Dice Duel:',
+                e
+            );
+
+            return res.status(500).json({
+                thanh_cong: false,
+                thong_bao:
+                    'Lỗi máy chủ'
+            });
+        }
+    }
+);
+
+
+/* =========================
+   DICE DUEL - PHÒNG ĐANG CHỜ
+   ========================= */
+
+app.get(
+    '/api/dice-duel/phong',
+    auth,
+    (req, res) => {
+
+        try{
+
+            const data = getDB();
+
+            ensureDiceDuelData(data);
+
+            const phong =
+                data.dice_duel_phong
+                    .filter(
+                        p =>
+                            p.trang_thai ===
+                            'dang_cho'
+                    )
+                    .slice()
+                    .reverse();
+
+            return res.json({
+
+                thanh_cong: true,
+
+                phong
+
+            });
+
+        }catch(e){
+
+            console.error(
+                'Lỗi tải phòng Dice Duel:',
+                e
+            );
+
+            return res.status(500).json({
+                thanh_cong: false,
+                thong_bao:
+                    'Lỗi máy chủ'
+            });
+        }
+    }
+);
+
+
+/* =========================
+   DICE DUEL - THAM GIA
+   ========================= */
+
+app.post(
+    '/api/dice-duel/tham-gia',
+    auth,
+    (req, res) => {
+
+        try{
+
+            const maPhong =
+                String(
+                    req.body.ma_phong || ''
+                )
+                .trim()
+                .toUpperCase();
+
+            if(!maPhong){
+
+                return res.status(400).json({
+                    thanh_cong: false,
+                    thong_bao:
+                        'Thiếu mã phòng'
+                });
+            }
+
+            const data = getDB();
+
+            ensureDiceDuelData(data);
+
+            const phong =
+                data.dice_duel_phong.find(
+                    p =>
+                        p.ma_phong ===
+                        maPhong
+                );
+
+            if(!phong){
+
+                return res.status(404).json({
+                    thanh_cong: false,
+                    thong_bao:
+                        'Không tìm thấy phòng'
+                });
+            }
+
+            if(
+                phong.trang_thai !==
+                'dang_cho'
+            ){
+
+                return res.status(400).json({
+                    thanh_cong: false,
+                    thong_bao:
+                        'Phòng không còn chờ'
+                });
+            }
+
+            if(
+                Number(
+                    phong.nguoi_choi_1.user_id
+                ) ===
+                Number(req.user.id)
+            ){
+
+                return res.status(400).json({
+                    thanh_cong: false,
+                    thong_bao:
+                        'Không thể tự tham gia phòng của mình'
+                });
+            }
+
+            const user =
+                timUserPvP(
+                    data,
+                    req.user.id
+                );
+
+            if(!user){
+
+                return res.status(404).json({
+                    thanh_cong: false,
+                    thong_bao:
+                        'Không tìm thấy tài khoản'
+                });
+            }
+
+            if(typeof user.coin !== 'number'){
+                user.coin = 1000;
+            }
+
+            const cuoc =
+                Number(
+                    phong.tien_cuoc
+                );
+
+            if(user.coin < cuoc){
+
+                return res.status(400).json({
+                    thanh_cong: false,
+                    thong_bao:
+                        'Không đủ Coin'
+                });
+            }
+
+            user.coin -= cuoc;
+
+            phong.nguoi_choi_2 = {
+
+                user_id:
+                    user.id,
+
+                email:
+                    user.email,
+
+                ket_qua:
+                    null,
+
+                diem:
+                    null,
+
+                coin_nhan:
+                    0
+            };
+
+            phong.trang_thai =
+                'dang_xu_ly';
+
+            /*
+             * Người thứ 2 vừa tham gia là
+             * server tự động đổ xúc xắc.
+             */
+            xuLyKetThucDiceDuel(
+                phong
+            );
+
+            saveDB();
+
+            return res.json({
+
+                thanh_cong: true,
+
+                phong,
+
+                coin:
+                    user.coin
+            });
+
+        }catch(e){
+
+            console.error(
+                'Lỗi tham gia Dice Duel:',
+                e
+            );
+
+            return res.status(500).json({
+                thanh_cong: false,
+                thong_bao:
+                    'Lỗi máy chủ'
+            });
+        }
+    }
+);
+
+
+/* =========================
+   DICE DUEL - XEM PHÒNG
+   ========================= */
+
+app.get(
+    '/api/dice-duel/phong/:ma',
+    auth,
+    (req, res) => {
+
+        try{
+
+            const data = getDB();
+
+            ensureDiceDuelData(data);
+
+            const maPhong =
+                String(
+                    req.params.ma || ''
+                )
+                .trim()
+                .toUpperCase();
+
+            const phong =
+                data.dice_duel_phong.find(
+                    p =>
+                        p.ma_phong ===
+                        maPhong
+                );
+
+            if(!phong){
+
+                return res.status(404).json({
+                    thanh_cong: false,
+                    thong_bao:
+                        'Không tìm thấy phòng'
+                });
+            }
+
+            const user =
+                timUserPvP(
+                    data,
+                    req.user.id
+                );
+
+            return res.json({
+
+                thanh_cong: true,
+
+                phong,
+
+                coin:
+                    user
+                        ? Number(user.coin || 0)
+                        : 0
+            });
+
+        }catch(e){
+
+            console.error(
+                'Lỗi xem phòng Dice Duel:',
+                e
+            );
+
+            return res.status(500).json({
+                thanh_cong: false,
+                thong_bao:
+                    'Lỗi máy chủ'
+            });
+        }
+    }
+);
+
+
+/* =========================
+   DICE DUEL - HỦY PHÒNG
+   ========================= */
+
+app.post(
+    '/api/dice-duel/huy-phong',
+    auth,
+    (req, res) => {
+
+        try{
+
+            const maPhong =
+                String(
+                    req.body.ma_phong || ''
+                )
+                .trim()
+                .toUpperCase();
+
+            const data = getDB();
+
+            ensureDiceDuelData(data);
+
+            const phong =
+                data.dice_duel_phong.find(
+                    p =>
+                        p.ma_phong ===
+                        maPhong
+                );
+
+            if(!phong){
+
+                return res.status(404).json({
+                    thanh_cong: false,
+                    thong_bao:
+                        'Không tìm thấy phòng'
+                });
+            }
+
+            if(
+                Number(
+                    phong.nguoi_choi_1.user_id
+                ) !==
+                Number(req.user.id)
+            ){
+
+                return res.status(403).json({
+                    thanh_cong: false,
+                    thong_bao:
+                        'Bạn không phải chủ phòng'
+                });
+            }
+
+            if(
+                phong.trang_thai !==
+                'dang_cho'
+            ){
+
+                return res.status(400).json({
+                    thanh_cong: false,
+                    thong_bao:
+                        'Không thể hủy phòng này'
+                });
+            }
+
+            const user =
+                timUserPvP(
+                    data,
+                    req.user.id
+                );
+
+            if(user){
+
+                user.coin =
+                    Number(user.coin || 0) +
+                    Number(phong.tien_cuoc);
+            }
+
+            phong.trang_thai =
+                'da_huy';
+
+            saveDB();
+
+            return res.json({
+
+                thanh_cong: true,
+
+                phong,
+
+                coin:
+                    user
+                        ? user.coin
+                        : 0
+            });
+
+        }catch(e){
+
+            console.error(
+                'Lỗi hủy Dice Duel:',
+                e
+            );
+
+            return res.status(500).json({
+                thanh_cong: false,
+                thong_bao:
+                    'Lỗi máy chủ'
+            });
+        }
+    }
+);
+
+
+/* =========================
+   DICE DUEL - LỊCH SỬ
+   ========================= */
+
+app.get(
+    '/api/dice-duel/lich-su',
+    auth,
+    (req, res) => {
+
+        try{
+
+            const data = getDB();
+
+            ensureDiceDuelData(data);
+
+            const userId =
+                Number(
+                    req.user.id
+                );
+
+            const lichSu =
+                data.lichsu_dice_duel
+                    .filter(
+                        p =>
+                            Number(
+                                p.nguoi_choi_1?.user_id
+                            ) === userId ||
+                            Number(
+                                p.nguoi_choi_2?.user_id
+                            ) === userId
+                    )
+                    .slice()
+                    .reverse();
+
+            return res.json({
+
+                thanh_cong: true,
+
+                lich_su:
+                    lichSu
+            });
+
+        }catch(e){
+
+            console.error(
+                'Lỗi lịch sử Dice Duel:',
+                e
+            );
+
+            return res.status(500).json({
+                thanh_cong: false,
+                thong_bao:
+                    'Lỗi máy chủ'
+            });
+        }
+    }
+);
+
+
 /* =========================
    LỊCH SỬ PVP
    ========================= */
