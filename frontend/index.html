@@ -929,7 +929,8 @@ td{
     margin-bottom:18px;
 }
 
-.pvp-coin{
+.pvp-coin,
+.pvp-coin-box{
     display:flex;
     align-items:center;
     justify-content:space-between;
@@ -951,7 +952,8 @@ td{
     margin:12px 0 18px;
 }
 
-.pvp-color{
+.pvp-color,
+.pvp-color-btn{
     border:1px solid rgba(255,255,255,.12);
     background:#151820;
     color:#fff;
@@ -962,12 +964,14 @@ td{
     transition:.2s;
 }
 
-.pvp-color:hover{
+.pvp-color:hover,
+.pvp-color-btn:hover{
     transform:translateY(-2px);
     border-color:#8b5cf6;
 }
 
-.pvp-color.selected{
+.pvp-color.selected,
+.pvp-color-btn.selected{
     border-color:#a78bfa;
     box-shadow:0 0 0 2px rgba(167,139,250,.2);
     background:rgba(139,92,246,.18);
@@ -1000,7 +1004,8 @@ td{
     margin-bottom:10px;
 }
 
-.pvp-btn{
+.pvp-btn,
+.pvp-main-btn{
     width:100%;
     padding:13px;
     border:0;
@@ -1011,7 +1016,8 @@ td{
     cursor:pointer;
 }
 
-.pvp-btn:hover{
+.pvp-btn:hover,
+.pvp-main-btn:hover{
     background:#7c3aed;
 }
 
@@ -2073,7 +2079,21 @@ td{
             </h3>
 
 
-<!-- ==================== PVP COLOR BATTLE ==================== -->
+
+
+<div
+                id="xosoHistory"
+            >
+                Đang tải...
+            </div>
+
+        </div>
+
+    </section>
+
+
+
+    <!-- ==================== PVP COLOR BATTLE ==================== -->
 <div id="page-pvp" class="page">
     <div class="pvp-box">
 
@@ -2173,17 +2193,6 @@ td{
     </div>
 </div>
 <!-- ==================== END PVP COLOR BATTLE ==================== -->
-
-<div
-                id="xosoHistory"
-            >
-                Đang tải...
-            </div>
-
-        </div>
-
-    </section>
-
 
 
     <!-- COLOR DICE -->
@@ -6798,7 +6807,6 @@ async function loadColorDiceHistory() {
     }
 }
 
-startApp();
 
 </script>
 
@@ -6859,7 +6867,7 @@ function chonMauPvP(mau, button){
     pvpMauDangChon = mau;
 
     document
-        .querySelectorAll('.pvp-color')
+        .querySelectorAll('.pvp-color-btn')
         .forEach(
             x => x.classList.remove('selected')
         );
@@ -7207,6 +7215,8 @@ function hienThiPhongPvP(phong){
         );
 
     if(!box || !phong) return;
+
+    box.style.display = 'block';
 
     const p1 =
         phong.nguoi_choi_1;
@@ -7683,6 +7693,7 @@ window.showPage =
         }
     };
 
+startApp();
 </script>
 
 </body>

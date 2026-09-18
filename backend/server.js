@@ -3386,32 +3386,57 @@ function xuLyKetThucPvP(phong) {
         p2.coin = 1000;
     }
 
-    const dice1 = rollPvPDice();
-    const dice2 = rollPvPDice();
+    const cuoc =
+        Number(phong.tien_cuoc);
 
-    const diem1 = tinhDiemPvP(
-        dice1,
-        phong.nguoi_choi_1.mau
-    );
+    /*
+     * HAI NGƯỜI DÙNG CHUNG MỘT LẦN ROLL.
+     *
+     * Nếu hòa -> tự động roll lại.
+     * Không cần người chơi bấm nút.
+     */
 
-    const diem2 = tinhDiemPvP(
-        dice2,
-        phong.nguoi_choi_2.mau
-    );
+    let dice = [];
+    let diem1 = 0;
+    let diem2 = 0;
+    let soLanRoll = 0;
 
-    const cuoc = Number(
-        phong.tien_cuoc
-    );
+    while (true) {
 
-    let ketQua = 'hoa';
-    let nguoiThang = null;
+        soLanRoll++;
 
-    let coinNhan1 = cuoc;
-    let coinNhan2 = cuoc;
+        dice = rollPvPDice();
+
+        diem1 = tinhDiemPvP(
+            dice,
+            phong.nguoi_choi_1.mau
+        );
+
+        diem2 = tinhDiemPvP(
+            dice,
+            phong.nguoi_choi_2.mau
+        );
+
+        /*
+         * Hai người bằng điểm -> roll lại.
+         */
+        if (diem1 === diem2) {
+            continue;
+        }
+
+        break;
+    }
+
+    let ketQua;
+    let nguoiThang;
+
+    let coinNhan1 = 0;
+    let coinNhan2 = 0;
 
     if (diem1 > diem2) {
 
-        ketQua = 'nguoi_choi_1_thang';
+        ketQua =
+            'nguoi_choi_1_thang';
 
         nguoiThang =
             p1.id;
@@ -3419,28 +3444,34 @@ function xuLyKetThucPvP(phong) {
         coinNhan1 =
             cuoc * 2;
 
-        coinNhan2 =
-            0;
+    } else {
 
-    } else if (diem2 > diem1) {
-
-        ketQua = 'nguoi_choi_2_thang';
+        ketQua =
+            'nguoi_choi_2_thang';
 
         nguoiThang =
             p2.id;
-
-        coinNhan1 =
-            0;
 
         coinNhan2 =
             cuoc * 2;
     }
 
+    /*
+     * Chỉ cộng thưởng SAU KHI có người thắng.
+     *
+     * Hai người đã bị trừ tiền cược lúc tham gia
+     * nên người thắng nhận lại tổng tiền cược của
+     * cả hai người.
+     */
+
     p1.coin += coinNhan1;
     p2.coin += coinNhan2;
 
+    /*
+     * Lưu cùng một bộ xúc xắc cho cả hai người.
+     */
     phong.nguoi_choi_1.ket_qua =
-        dice1;
+        dice;
 
     phong.nguoi_choi_1.diem =
         diem1;
@@ -3449,13 +3480,16 @@ function xuLyKetThucPvP(phong) {
         coinNhan1;
 
     phong.nguoi_choi_2.ket_qua =
-        dice2;
+        dice;
 
     phong.nguoi_choi_2.diem =
         diem2;
 
     phong.nguoi_choi_2.coin_nhan =
         coinNhan2;
+
+    phong.so_lan_roll =
+        soLanRoll;
 
     phong.nguoi_thang =
         nguoiThang;
@@ -3480,6 +3514,9 @@ function xuLyKetThucPvP(phong) {
     const now =
         new Date().toISOString();
 
+    /*
+     * Lịch sử giao dịch người chơi 1
+     */
     data.lichsu_giao_dich.push({
 
         id:
@@ -3496,19 +3533,18 @@ function xuLyKetThucPvP(phong) {
 
         noi_dung:
             `PvP ${phong.match_id} - ${
-                ketQua === 'hoa'
-                    ? 'Hòa'
-                    : (
-                        nguoiThang === p1.id
-                            ? 'Thắng'
-                            : 'Thua'
-                    )
+                nguoiThang === p1.id
+                    ? 'Thắng'
+                    : 'Thua'
             }`,
 
         thoi_gian:
             now
     });
 
+    /*
+     * Lịch sử giao dịch người chơi 2
+     */
     data.lichsu_giao_dich.push({
 
         id:
@@ -3525,19 +3561,18 @@ function xuLyKetThucPvP(phong) {
 
         noi_dung:
             `PvP ${phong.match_id} - ${
-                ketQua === 'hoa'
-                    ? 'Hòa'
-                    : (
-                        nguoiThang === p2.id
-                            ? 'Thắng'
-                            : 'Thua'
-                    )
+                nguoiThang === p2.id
+                    ? 'Thắng'
+                    : 'Thua'
             }`,
 
         thoi_gian:
             now
     });
 
+    /*
+     * Lưu lịch sử trận đấu
+     */
     data.lichsu_pvp.push({
 
         id:
@@ -3591,6 +3626,12 @@ function xuLyKetThucPvP(phong) {
         nguoi_thang:
             nguoiThang,
 
+        dice:
+            dice,
+
+        so_lan_roll:
+            soLanRoll,
+
         thoi_gian:
             now
     });
@@ -3599,7 +3640,6 @@ function xuLyKetThucPvP(phong) {
 
     return phong;
 }
-
 
 /* =========================
    TẠO PHÒNG
