@@ -1209,6 +1209,58 @@ td{
     white-space:pre-line;
 }
 
+
+/* COLOR DICE HISTORY - KHUNG GỌN */
+#diceHistoryList{
+    max-height:280px;
+    overflow-y:auto;
+    overflow-x:hidden;
+    padding-right:4px;
+    scrollbar-width:thin;
+}
+
+#diceHistoryList::-webkit-scrollbar{
+    width:6px;
+}
+
+#diceHistoryList::-webkit-scrollbar-track{
+    background:rgba(255,255,255,.03);
+    border-radius:10px;
+}
+
+#diceHistoryList::-webkit-scrollbar-thumb{
+    background:rgba(139,92,246,.45);
+    border-radius:10px;
+}
+
+.color-dice-history-item{
+    padding:10px 12px;
+    margin-bottom:7px;
+    border:1px solid rgba(255,255,255,.07);
+    border-radius:10px;
+    background:rgba(255,255,255,.025);
+}
+
+.color-dice-history-head{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:8px;
+    flex-wrap:wrap;
+}
+
+.color-dice-history-details{
+    margin-top:5px;
+    font-size:12px;
+    line-height:1.55;
+    color:var(--muted);
+}
+
+.color-dice-history-result{
+    margin-top:4px;
+    font-size:13px;
+}
+
 .dice-duel-result{
     text-align:center;
     padding:20px;
@@ -1216,6 +1268,60 @@ td{
     background:#17121f;
     border:1px solid #49336f;
 }
+
+/* POPUP KET QUA DICE DUEL */
+#diceDuelResultOverlay{
+    position:fixed;
+    inset:0;
+    z-index:999999;
+    display:none;
+    align-items:center;
+    justify-content:center;
+    padding:18px;
+    background:rgba(0,0,0,.78);
+    backdrop-filter:blur(7px);
+}
+
+#diceDuelResultPopup{
+    width:min(520px,100%);
+    max-height:90vh;
+    overflow-y:auto;
+    border-radius:18px;
+    background:#0f1117;
+    border:1px solid #6d4bb8;
+    box-shadow:0 20px 80px rgba(0,0,0,.65);
+    animation:diceDuelPopupIn .22s ease-out;
+}
+
+#diceDuelResultPopup .dice-duel-result{
+    border:0;
+    background:transparent;
+}
+
+#diceDuelResultClose{
+    display:block;
+    width:calc(100% - 36px);
+    margin:0 18px 18px;
+    padding:12px;
+    border:0;
+    border-radius:11px;
+    background:#8b5cf6;
+    color:#fff;
+    font-size:15px;
+    font-weight:800;
+}
+
+@keyframes diceDuelPopupIn{
+    from{
+        opacity:0;
+        transform:scale(.92) translateY(12px);
+    }
+    to{
+        opacity:1;
+        transform:scale(1) translateY(0);
+    }
+}
+
 
 .dice-duel-dice{
     font-size:38px;
@@ -2501,14 +2607,37 @@ td{
 
     
         <!-- COLOR DICE HISTORY -->
-        <div class="card" style="margin-top:20px;">
-            <h3 class="section-title">📜 Lịch sử Color Dice</h3>
+        <div class="card color-dice-history-card" style="margin-top:20px;">
+
+            <div style="
+                display:flex;
+                align-items:center;
+                justify-content:space-between;
+                gap:10px;
+                margin-bottom:12px;
+            ">
+                <h3 class="section-title" style="margin:0;">
+                    📜 Lịch sử Color Dice
+                </h3>
+
+                <span style="
+                    font-size:11px;
+                    color:var(--muted);
+                ">
+                    Vuốt để xem
+                </span>
+            </div>
 
             <div id="diceHistoryList">
-                <div style="color:var(--muted);text-align:center;padding:15px;">
+                <div style="
+                    color:var(--muted);
+                    text-align:center;
+                    padding:15px;
+                ">
                     Đang tải lịch sử...
                 </div>
             </div>
+
         </div>
 
     <!-- ADMIN DASHBOARD -->
@@ -6993,11 +7122,72 @@ async function loadColorDiceHistory() {
         }
         const names = { do:"🔴 Đỏ", xanh_la:"🟢 Xanh lá", xanh_duong:"🔵 Xanh dương", vang:"🟡 Vàng", tim:"🟣 Tím", cam:"🟠 Cam" };
         box.innerHTML = history.map(x => {
-            const kq = (x.ket_qua || []).map(c => names[c] || c).join(" · ");
-            const time = x.thoi_gian ? new Date(x.thoi_gian).toLocaleString("vi-VN") : "";
-            return "<div style=\"padding:12px;margin-bottom:8px;border:1px solid rgba(255,255,255,.08);border-radius:12px;background:rgba(255,255,255,.03);\">" +
-                "<strong>" + (names[x.mau_chon] || x.mau_chon) + "</strong> <small style=\"color:var(--muted)\">" + time + "</small>" +
-                "<div style=\"margin-top:6px;font-size:13px;line-height:1.7\">🎲 Kết quả: " + kq + "<br>🎯 Đúng: " + Number(x.so_mau_dung || 0) + "/4<br>💰 Cược: " + formatNumber(Number(x.tien_cuoc || 0)) + " Coin<br>📈 Hệ số: " + Number(x.he_so || 0) + "x<br>🪙 Nhận: " + formatNumber(Number(x.coin_nhan || 0)) + " Coin<br>💳 Còn lại: " + formatNumber(Number(x.coin_con_lai || 0)) + " Coin</div></div>";
+
+            const kq =
+                (x.ket_qua || [])
+                    .map(c => names[c] || c)
+                    .join(" · ");
+
+            const time =
+                x.thoi_gian
+                    ? new Date(x.thoi_gian)
+                        .toLocaleString("vi-VN")
+                    : "";
+
+            return `
+                <div class="color-dice-history-item">
+
+                    <div class="color-dice-history-head">
+
+                        <strong>
+                            ${names[x.mau_chon] || x.mau_chon}
+                        </strong>
+
+                        <small style="color:var(--muted)">
+                            ${time}
+                        </small>
+
+                    </div>
+
+                    <div class="color-dice-history-result">
+                        🎲 ${kq}
+                    </div>
+
+                    <div class="color-dice-history-details">
+
+                        🎯 Đúng:
+                        <strong>
+                            ${Number(x.so_mau_dung || 0)}/4
+                        </strong>
+
+                        &nbsp;•&nbsp;
+
+                        💰 Cược:
+                        ${formatNumber(Number(x.tien_cuoc || 0))}
+
+                        Coin
+
+                        &nbsp;•&nbsp;
+
+                        📈 ${Number(x.he_so || 0)}x
+
+                        <br>
+
+                        🪙 Nhận:
+                        ${formatNumber(Number(x.coin_nhan || 0))}
+                        Coin
+
+                        &nbsp;•&nbsp;
+
+                        💳 Còn:
+                        ${formatNumber(Number(x.coin_con_lai || 0))}
+                        Coin
+
+                    </div>
+
+                </div>
+            `;
+
         }).join("");
     } catch (e) {
         console.error("Lỗi lịch sử Color Dice:", e);
@@ -8023,57 +8213,220 @@ async function taiPhongDiceDuel(){
             return;
         }
 
+        /*
+         * Lấy ID tài khoản hiện tại.
+         */
+        let myUserId = null;
+
+        try{
+
+            if(
+                typeof account !== "undefined" &&
+                account?.id != null
+            ){
+                myUserId =
+                    Number(account.id);
+            }
+
+            if(myUserId === null){
+
+                const savedUser =
+                    localStorage.getItem(
+                        "poghazi_user"
+                    );
+
+                if(savedUser){
+
+                    const user =
+                        JSON.parse(savedUser);
+
+                    myUserId =
+                        Number(
+                            user?.id ??
+                            user?.user_id
+                        );
+                }
+            }
+
+        }catch(e){
+
+            console.error(
+                "Lỗi lấy ID tài khoản:",
+                e
+            );
+
+        }
+
         if(data.phong.length === 0){
 
             box.innerHTML =
-                '<div style="color:#9ca3af">Chưa có phòng nào đang chờ.</div>';
+                '<div style="color:#9ca3af;text-align:center;padding:12px;">Chưa có phòng nào đang chờ.</div>';
 
             return;
         }
 
         box.innerHTML =
-            data.phong.map(phong => `
+            data.phong.map(phong => {
 
-                <div class="dice-duel-room">
+                const ownerId =
+                    Number(
+                        phong.nguoi_choi_1?.user_id
+                    );
 
-                    <div>
+                const laPhongCuaToi =
+                    myUserId !== null &&
+                    Number.isFinite(myUserId) &&
+                    ownerId === myUserId;
 
-                        <b>
-                            🎲 Phòng ${phong.ma_phong}
-                        </b>
+                const emailChuPhong =
+                    String(
+                        phong.nguoi_choi_1?.email || ""
+                    );
 
-                        <div
-                            style="color:#9ca3af;margin-top:5px"
-                        >
-                            🪙 Cược:
-                            ${Number(
-                                phong.tien_cuoc || 0
-                            ).toLocaleString()}
-                            Coin
+                /*
+                 * Lấy phần trước @gmail.com / @...
+                 */
+                const tenChuPhong =
+                    emailChuPhong.includes("@")
+                        ? emailChuPhong.split("@")[0]
+                        : (
+                            emailChuPhong ||
+                            "Người chơi"
+                        );
+
+                const tienCuoc =
+                    Number(
+                        phong.tien_cuoc || 0
+                    ).toLocaleString("vi-VN");
+
+                return `
+
+                    <div
+                        class="dice-duel-room"
+                        style="
+                            border:
+                                1px solid
+                                ${laPhongCuaToi
+                                    ? "rgba(139,92,246,.65)"
+                                    : "#252936"};
+                            box-shadow:
+                                ${laPhongCuaToi
+                                    ? "0 0 0 1px rgba(139,92,246,.12)"
+                                    : "none"};
+                            padding:14px;
+                            border-radius:14px;
+                            margin-bottom:10px;
+                            background:
+                                ${laPhongCuaToi
+                                    ? "rgba(139,92,246,.07)"
+                                    : "rgba(255,255,255,.025)"};
+                        "
+                    >
+
+                        <div style="min-width:0;">
+
+                            <div style="
+                                display:flex;
+                                align-items:center;
+                                gap:8px;
+                                flex-wrap:wrap;
+                                margin-bottom:8px;
+                            ">
+
+                                <b>
+                                    🎲 Phòng ${phong.ma_phong}
+                                </b>
+
+                                <span style="
+                                    font-size:10px;
+                                    font-weight:900;
+                                    padding:4px 8px;
+                                    border-radius:999px;
+                                    background:
+                                        ${laPhongCuaToi
+                                            ? "rgba(139,92,246,.22)"
+                                            : "rgba(255,255,255,.07)"};
+                                    color:
+                                        ${laPhongCuaToi
+                                            ? "#c4b5fd"
+                                            : "#9ca3af"};
+                                ">
+                                    ${laPhongCuaToi
+                                        ? "🏠 PHÒNG CỦA BẠN"
+                                        : "👤 PHÒNG NGƯỜI KHÁC"}
+                                </span>
+
+                            </div>
+
+                            <div style="
+                                font-size:13px;
+                                margin-bottom:6px;
+                            ">
+                                👤 Chủ phòng:
+                                <strong>
+                                    ${tenChuPhong}
+                                </strong>
+                            </div>
+
+                            <div style="
+                                color:#9ca3af;
+                                font-size:13px;
+                            ">
+                                🪙 Cược:
+                                <strong>
+                                    ${tienCuoc}
+                                </strong>
+                                Coin
+                            </div>
+
                         </div>
+
+                        ${
+                            laPhongCuaToi
+
+                                ? `
+
+                                    <button
+                                        onclick="huyPhongDiceDuel('${phong.ma_phong}')"
+                                        style="
+                                            background:#7f1d1d;
+                                            border:1px solid #ef4444;
+                                            color:#fecaca;
+                                            font-weight:900;
+                                        "
+                                    >
+                                        ❌ HỦY PHÒNG
+                                    </button>
+
+                                `
+
+                                : `
+
+                                    <button
+                                        onclick="thamGiaDiceDuel('${phong.ma_phong}')"
+                                    >
+                                        ⚔️ THAM GIA
+                                    </button>
+
+                                `
+                        }
 
                     </div>
 
-                    <button
-                        onclick="thamGiaDiceDuel('${phong.ma_phong}')"
-                    >
-                        THAM GIA
-                    </button>
+                `;
 
-                </div>
-
-            `).join("");
+            }).join("");
 
     }catch(e){
 
         console.error(e);
 
         box.innerHTML =
-            "Lỗi tải phòng.";
+            "Lỗi tải danh sách phòng.";
 
     }
-}
 
+}
 
 async function taoPhongDiceDuel(){
 
@@ -8085,17 +8438,7 @@ async function taoPhongDiceDuel(){
     const cuoc =
         Number(input?.value || 0);
 
-    const debugBox =
-        document.getElementById("diceDuelStatus");
-
-    if(debugBox){
-        debugBox.textContent =
-            "DEBUG: value=" + String(input?.value) +
-            " | cuoc=" + String(cuoc) +
-            " | integer=" + String(Number.isInteger(cuoc));
-    }
-
-    if(
+if(
         !Number.isInteger(cuoc) ||
         cuoc < 10 ||
         cuoc > 1000000
@@ -8159,6 +8502,67 @@ async function taoPhongDiceDuel(){
 }
 
 
+
+async function huyPhongDiceDuel(maPhong){
+
+    const ok =
+        confirm(
+            "Hủy phòng " +
+            maPhong +
+            "?\n\nCoin cược sẽ được hoàn lại cho bạn."
+        );
+
+    if(!ok) return;
+
+    try{
+
+        const data =
+            await diceDuelApi(
+                "/api/dice-duel/huy-phong",
+                {
+                    method:"POST",
+                    body:JSON.stringify({
+                        ma_phong:maPhong
+                    })
+                }
+            );
+
+        if(
+            !data ||
+            !data.thanh_cong
+        ){
+
+            alert(
+                data?.thong_bao ||
+                "Không thể hủy phòng."
+            );
+
+            return;
+        }
+
+        alert(
+            data.thong_bao ||
+            "Đã hủy phòng."
+        );
+
+        await capNhatCoinDiceDuel();
+        await taiPhongDiceDuel();
+
+    }catch(e){
+
+        console.error(
+            "Lỗi hủy phòng Dice Duel:",
+            e
+        );
+
+        alert(
+            "Lỗi kết nối máy chủ."
+        );
+
+    }
+
+}
+
 async function thamGiaDiceDuel(maPhong){
 
     if(
@@ -8212,6 +8616,64 @@ async function thamGiaDiceDuel(maPhong){
             "Lỗi kết nối máy chủ."
         );
 
+    }
+}
+
+
+function taoPopupKetQuaDiceDuel(){
+
+    let overlay =
+        document.getElementById(
+            "diceDuelResultOverlay"
+        );
+
+    if(overlay) return overlay;
+
+    overlay =
+        document.createElement("div");
+
+    overlay.id =
+        "diceDuelResultOverlay";
+
+    overlay.innerHTML = `
+        <div id="diceDuelResultPopup">
+
+            <div id="diceDuelResultContent"></div>
+
+            <button
+                id="diceDuelResultClose"
+                onclick="dongPopupKetQuaDiceDuel()"
+            >
+                ĐÓNG
+            </button>
+
+        </div>
+    `;
+
+    document.body.appendChild(overlay);
+
+    overlay.addEventListener(
+        "click",
+        function(e){
+            if(e.target === overlay){
+                dongPopupKetQuaDiceDuel();
+            }
+        }
+    );
+
+    return overlay;
+}
+
+
+function dongPopupKetQuaDiceDuel(){
+
+    const overlay =
+        document.getElementById(
+            "diceDuelResultOverlay"
+        );
+
+    if(overlay){
+        overlay.style.display = "none";
     }
 }
 
@@ -8702,7 +9164,7 @@ async function taiLichSuDiceDuel(){
     }
 }
 
-/* Tự tải khi mở Dice Duel */
+/* Tự tải khi mở Dice Duel + theo dõi kết quả */
 const oldShowPageDiceDuel = window.showPage;
 
 window.showPage = function(page, element){
@@ -8723,9 +9185,28 @@ window.showPage = function(page, element){
         taiPhongDiceDuel();
         taiLichSuDiceDuel();
 
+        // Theo dõi người chơi vào phòng và kết quả trận
+        batTheoDoiKetQuaDiceDuel();
+
+    }else{
+
+        // Rời Dice Duel thì dừng polling
+        tatTheoDoiKetQuaDiceDuel();
+
     }
 };
-
 </script>
+
+<script>
+document.addEventListener("DOMContentLoaded", function(){
+    const history = document.querySelector(".color-dice-history-card");
+    const page = document.getElementById("page-color-dice");
+
+    if(history && page){
+        page.appendChild(history);
+    }
+});
+</script>
+
 </body>
 </html>
