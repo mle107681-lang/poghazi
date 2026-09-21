@@ -3419,16 +3419,6 @@ async function startApp(){
         .getElementById("authScreen")
         .classList.add("hidden");
 
-        // Nếu đang ở trang Admin, tải Admin sau khi app khởi tạo xong
-        const adminPage = document.getElementById("page-admin");
-
-        if(
-            adminPage &&
-            adminPage.classList.contains("active") &&
-            isAdmin()
-        ){
-            await loadAdminDashboard();
-        }
 
 
     }catch(error){
@@ -5170,16 +5160,140 @@ async function loadAdminDashboard(){
     if(!isAdmin()) return;
 
     const page = document.getElementById("page-admin");
+    if(!page) return;
 
-    if(page){
-        page.classList.add("active");
+    page.classList.add("active");
+
+    try{
+
+        const [statsRes, depositRes, usersRes, ordersRes, servicesRes] =
+            await Promise.all([
+                api("/api/admin/thong-ke"),
+                api("/api/admin/nap-tien"),
+                api("/api/admin/users"),
+                api("/api/don-hang"),
+                api("/api/admin/dich-vu")
+            ]);
+
+        const stats = statsRes.thong_ke || {};
+        const deposits = depositRes.yeu_cau || [];
+        const users = usersRes.users || [];
+        const orders = ordersRes.don_hang || [];
+        const services = servicesRes.dich_vu || [];
+
+        // THỐNG KÊ
+        const setText = (id, value) => {
+            const el = document.getElementById(id);
+            if(el) el.textContent = value;
+        };
+
+        setText("adminUsersCount", stats.tong_nguoi_dung ?? users.length);
+        setText("adminOrdersCount", stats.tong_don_hang ?? orders.length);
+        setText(
+            "adminRevenue",
+            money(stats.tong_doanh_thu || 0)
+        );
+        setText(
+            "adminPendingDeposit",
+            stats.yeu_cau_nap_cho_duyet ?? deposits.length
+        );
+
+        // NẠP TIỀN
+        const depositBox = document.getElementById("adminDeposits");
+
+        if(depositBox){
+            if(!deposits.length){
+                depositBox.innerHTML =
+                    "<p>Chưa có yêu cầu nạp tiền.</p>";
+            }else{
+                depositBox.innerHTML = deposits.map(item => `
+                    <div class="admin-row">
+                        <div>
+                            <b>${item.email || item.user_email || "-"}</b>
+                            <div>${money(item.so_tien || item.amount || 0)}</div>
+                            <small>${item.trang_thai || "cho_duyet"}</small>
+                        </div>
+                    </div>
+                `).join("");
+            }
+        }
+
+        // NGƯỜI DÙNG
+        const userBox = document.getElementById("adminUsers");
+
+        if(userBox){
+            if(!users.length){
+                userBox.innerHTML =
+                    "<p>Chưa có người dùng.</p>";
+            }else{
+                userBox.innerHTML = users.map(user => `
+                    <div class="admin-row">
+                        <div>
+                            <b>${user.email || "-"}</b>
+                            <div>Số dư: ${money(user.so_du || 0)}</div>
+                            <div>Coin: ${user.coin || 0}</div>
+                        </div>
+                    </div>
+                `).join("");
+            }
+        }
+
+        // ĐƠN HÀNG
+        const orderBox = document.getElementById("adminOrders");
+
+        if(orderBox){
+            if(!orders.length){
+                orderBox.innerHTML =
+                    "<p>Chưa có đơn hàng.</p>";
+            }else{
+                orderBox.innerHTML = orders.map(order => `
+                    <div class="admin-row">
+                        <div>
+                            <b>${order.dich_vu || order.service || "Đơn hàng"}</b>
+                            <div>${money(order.gia || order.price || 0)}</div>
+                            <small>${order.trang_thai || order.status || "-"}</small>
+                        </div>
+                    </div>
+                `).join("");
+            }
+        }
+
+        // DỊCH VỤ
+        const serviceBox = document.getElementById("adminServices");
+
+        if(serviceBox){
+            if(!services.length){
+                serviceBox.innerHTML =
+                    "<p>Chưa có dịch vụ.</p>";
+            }else{
+                serviceBox.innerHTML = services.map(service => `
+                    <div class="admin-row">
+                        <div>
+                            <b>${service.ten || service.name || "Dịch vụ"}</b>
+                            <div>${money(service.gia || service.price || 0)}</div>
+                        </div>
+                    </div>
+                `).join("");
+            }
+        }
+
+    }catch(error){
+
+        console.error("ADMIN ERROR:", error);
+
+        const page = document.getElementById("page-admin");
+
+        if(page){
+            const errorBox = document.createElement("div");
+            errorBox.style.cssText =
+                "margin:20px 0;padding:15px;border-radius:12px;background:#2a1515;color:#ff8a8a;";
+
+            errorBox.textContent =
+                "Lỗi Admin: " + (error.message || error);
+
+            page.appendChild(errorBox);
+        }
     }
-
-    await loadAdminStats();
-    await loadAdminDeposits();
-    await loadAdminUsers();
-    await loadAdminOrders();
-    await loadAdminServices();
 }
 
 
