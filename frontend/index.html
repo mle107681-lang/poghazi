@@ -1580,7 +1580,7 @@ td{
         id="adminNavButton"
         class="nav-item"
         style="display:none;"
-        onclick="alert('DEBUG 1 - NUT ADMIN'); loadAdminDashboard();"
+        onclick="showPage('admin', this); loadAdminDashboard();"
     >
         ⚙️ Quản trị Admin
     </button>
@@ -5156,66 +5156,15 @@ function updateAdminButton(){
 
 async function loadAdminDashboard(){
 
-    if(!isAdmin()){
-        alert("DEBUG: isAdmin = FALSE");
-        return;
-    }
+    if(!isAdmin()) return;
 
-    alert("DEBUG: isAdmin = TRUE");
-
-    try{
-        alert("DEBUG: Đang tải THỐNG KÊ");
-        await loadAdminStats();
-        alert("DEBUG: THỐNG KÊ OK");
-    }catch(error){
-        alert("LỖI THỐNG KÊ: " + (error.message || error));
-    }
-
-    try{
-        alert("DEBUG: Đang tải NẠP TIỀN");
-        await loadAdminDeposits();
-        alert("DEBUG: NẠP TIỀN OK");
-    }catch(error){
-        alert("LỖI NẠP TIỀN: " + (error.message || error));
-    }
-
-    try{
-        alert("DEBUG: Đang tải NGƯỜI DÙNG");
-        await loadAdminUsers();
-        alert("DEBUG: NGƯỜI DÙNG OK");
-    }catch(error){
-        alert("LỖI NGƯỜI DÙNG: " + (error.message || error));
-    }
-
-    try{
-        alert("DEBUG: Đang tải ĐƠN HÀNG");
-        await loadAdminOrders();
-        alert("DEBUG: ĐƠN HÀNG OK");
-    }catch(error){
-        alert("LỖI ĐƠN HÀNG: " + (error.message || error));
-    }
-
-    try{
-        alert("DEBUG: Đang tải DỊCH VỤ");
-        await loadAdminServices();
-        alert("DEBUG: DỊCH VỤ OK");
-    }catch(error){
-        alert("LỖI DỊCH VỤ: " + (error.message || error));
-    }
-
-    alert(
-        "DEBUG DOM SAU KHI LOAD:\n\n" +
-        "Users = " + (document.getElementById("adminUsersCount")?.textContent || "NULL") + "\n" +
-        "Orders = " + (document.getElementById("adminOrdersCount")?.textContent || "NULL") + "\n" +
-        "Revenue = " + (document.getElementById("adminRevenue")?.textContent || "NULL") + "\n" +
-        "Pending = " + (document.getElementById("adminPendingDeposit")?.textContent || "NULL") + "\n\n" +
-        "Deposits = " + (document.getElementById("adminDeposits")?.innerText || "NULL").slice(0,200) + "\n" +
-        "Users box = " + (document.getElementById("adminUsers")?.innerText || "NULL").slice(0,200) + "\n" +
-        "Orders box = " + (document.getElementById("adminOrders")?.innerText || "NULL").slice(0,200) + "\n" +
-        "Services box = " + (document.getElementById("adminServices")?.innerText || "NULL").slice(0,200)
-    );
-
-    alert("DEBUG: HOÀN TẤT ADMIN");
+    await Promise.allSettled([
+        loadAdminStats(),
+        loadAdminDeposits(),
+        loadAdminUsers(),
+        loadAdminOrders(),
+        loadAdminServices()
+    ]);
 }
 
 
@@ -5226,12 +5175,6 @@ async function loadAdminDashboard(){
 async function loadAdminStats(){
 
     const data = await api("/api/admin/thong-ke");
-
-    alert(
-        "DEBUG RESPONSE THONG KE:\n\n" +
-        JSON.stringify(data, null, 2)
-    );
-
     const stats = data.thong_ke || {};
 
     document.getElementById("adminUsersCount").textContent =
