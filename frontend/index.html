@@ -5156,6 +5156,8 @@ function updateAdminButton(){
 
 async function loadAdminDashboard(){
 
+    showToast("DEBUG: Đã gọi loadAdminDashboard()", "success");
+
     if(!isAdmin()){
 
         showToast(
