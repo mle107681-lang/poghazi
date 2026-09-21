@@ -5213,35 +5213,26 @@ async function loadAdminDashboard(){
 
 async function loadAdminStats(){
 
-    const data =
-        await api(
-            "/api/admin/thong-ke"
-        );
+    const data = await api("/api/admin/thong-ke");
 
-    const stats =
-        data.thong_ke || {};
+    alert(
+        "DEBUG RESPONSE THONG KE:\n\n" +
+        JSON.stringify(data, null, 2)
+    );
 
-    document
-        .getElementById("adminUsersCount")
-        .textContent =
-            stats.tong_nguoi_dung ?? 0;
+    const stats = data.thong_ke || {};
 
-    document
-        .getElementById("adminOrdersCount")
-        .textContent =
-            stats.tong_don_hang ?? 0;
+    document.getElementById("adminUsersCount").textContent =
+        stats.tong_nguoi_dung ?? 0;
 
-    document
-        .getElementById("adminRevenue")
-        .textContent =
-            money(
-                stats.tong_doanh_thu || 0
-            );
+    document.getElementById("adminOrdersCount").textContent =
+        stats.tong_don_hang ?? 0;
 
-    document
-        .getElementById("adminPendingDeposit")
-        .textContent =
-            stats.yeu_cau_nap_cho_duyet ?? 0;
+    document.getElementById("adminRevenue").textContent =
+        money(stats.tong_doanh_thu || 0);
+
+    document.getElementById("adminPendingDeposit").textContent =
+        stats.yeu_cau_nap_cho_duyet ?? 0;
 }
 
 
