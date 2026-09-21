@@ -5166,29 +5166,48 @@ async function loadAdminDashboard(){
         return;
     }
 
-    try{
+    const tasks = [
+        ["Thống kê", loadAdminStats],
+        ["Nạp tiền", loadAdminDeposits],
+        ["Người dùng", loadAdminUsers],
+        ["Đơn hàng", loadAdminOrders],
+        ["Dịch vụ", loadAdminServices]
+    ];
 
-        await Promise.all([
-            loadAdminStats(),
-            loadAdminDeposits(),
-            loadAdminUsers(),
-            loadAdminOrders(),
-            loadAdminServices()
-        ]);
+    let loi = 0;
 
-    }catch(error){
+    for(const [name, fn] of tasks){
 
-        console.error(
-            "Admin error:",
-            error
-        );
+        try{
+
+            await fn();
+
+        }catch(error){
+
+            loi++;
+
+            console.error(
+                "ADMIN " + name + " ERROR:",
+                error
+            );
+
+            showToast(
+                name + ": " +
+                (error.message || "Không tải được"),
+                "error"
+            );
+        }
+    }
+
+    if(!loi){
 
         showToast(
-            error.message ||
-            "Không thể tải dữ liệu Admin.",
-            "error"
+            "Đã tải dữ liệu Admin.",
+            "success"
         );
+
     }
+
 }
 
 
@@ -8109,7 +8128,6 @@ window.showPage =
         }
     };
 
-startApp();
 </script>
 
 
