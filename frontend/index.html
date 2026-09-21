@@ -7286,6 +7286,45 @@ async function loadColorDiceHistory() {
 }
 
 
+
+/* ===== TEMP ADMIN DOM WATCH ===== */
+(function(){
+    const adminPage = document.getElementById("page-admin");
+    if(!adminPage) return;
+
+    let checked = false;
+
+    const checkAdminDOM = () => {
+        if(!adminPage.classList.contains("active")){
+            checked = false;
+            return;
+        }
+
+        if(checked) return;
+        checked = true;
+
+        setTimeout(() => {
+            alert(
+                "ADMIN DOM SAU 1.5 GIAY\n\n" +
+                "Users: " + (document.getElementById("adminUsersCount")?.textContent || "-") + "\n" +
+                "Orders: " + (document.getElementById("adminOrdersCount")?.textContent || "-") + "\n" +
+                "Revenue: " + (document.getElementById("adminRevenue")?.textContent || "-") + "\n" +
+                "Pending: " + (document.getElementById("adminPendingDeposit")?.textContent || "-") + "\n\n" +
+                "Users box: " + (document.getElementById("adminUsers")?.textContent || "").trim().slice(0,150)
+            );
+        }, 1500);
+    };
+
+    const observer = new MutationObserver(checkAdminDOM);
+
+    observer.observe(adminPage, {
+        attributes: true,
+        attributeFilter: ["class"]
+    });
+
+    checkAdminDOM();
+})();
+
 </script>
 
 
