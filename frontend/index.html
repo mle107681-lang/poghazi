@@ -5203,6 +5203,18 @@ async function loadAdminDashboard(){
         alert("LỖI DỊCH VỤ: " + (error.message || error));
     }
 
+    alert(
+        "DEBUG DOM SAU KHI LOAD:\n\n" +
+        "Users = " + (document.getElementById("adminUsersCount")?.textContent || "NULL") + "\n" +
+        "Orders = " + (document.getElementById("adminOrdersCount")?.textContent || "NULL") + "\n" +
+        "Revenue = " + (document.getElementById("adminRevenue")?.textContent || "NULL") + "\n" +
+        "Pending = " + (document.getElementById("adminPendingDeposit")?.textContent || "NULL") + "\n\n" +
+        "Deposits = " + (document.getElementById("adminDeposits")?.innerText || "NULL").slice(0,200) + "\n" +
+        "Users box = " + (document.getElementById("adminUsers")?.innerText || "NULL").slice(0,200) + "\n" +
+        "Orders box = " + (document.getElementById("adminOrders")?.innerText || "NULL").slice(0,200) + "\n" +
+        "Services box = " + (document.getElementById("adminServices")?.innerText || "NULL").slice(0,200)
+    );
+
     alert("DEBUG: HOÀN TẤT ADMIN");
 }
 
