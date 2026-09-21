@@ -3419,6 +3419,17 @@ async function startApp(){
         .getElementById("authScreen")
         .classList.add("hidden");
 
+        // Nếu đang ở trang Admin, tải Admin sau khi app khởi tạo xong
+        const adminPage = document.getElementById("page-admin");
+
+        if(
+            adminPage &&
+            adminPage.classList.contains("active") &&
+            isAdmin()
+        ){
+            await loadAdminDashboard();
+        }
+
 
     }catch(error){
 
@@ -5158,13 +5169,17 @@ async function loadAdminDashboard(){
 
     if(!isAdmin()) return;
 
-    await Promise.allSettled([
-        loadAdminStats(),
-        loadAdminDeposits(),
-        loadAdminUsers(),
-        loadAdminOrders(),
-        loadAdminServices()
-    ]);
+    const page = document.getElementById("page-admin");
+
+    if(page){
+        page.classList.add("active");
+    }
+
+    await loadAdminStats();
+    await loadAdminDeposits();
+    await loadAdminUsers();
+    await loadAdminOrders();
+    await loadAdminServices();
 }
 
 
